@@ -1,0 +1,36 @@
+@startsalt
+{
+  {/ <b>CCPM System - Basic Layout Structure</b> }
+  ==
+  {
+    {* Header (Fixed) - Logo, Navigation, User Menu, Notifications, Language }
+    --
+    {T
+      Sidebar
+      (Collapsible)
+      + Dashboard
+      + Projects  
+      + Tasks
+      + Analytics
+      + Reports
+      + Admin
+      |
+      {
+        <b>Main Content Area</b>
+        .
+        Dynamic content based on selected menu
+        .
+        - Dashboard widgets
+        - Project management
+        - Task views  
+        - Charts and reports
+        - Configuration panels
+        .
+        Responsive layout adapts to screen size
+      }
+    }
+    --
+    {* Footer - Copyright, Version, Support Links }
+  }
+}
+@endsalt

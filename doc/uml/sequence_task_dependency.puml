@@ -1,0 +1,125 @@
+@startuml Task Dependency Management
+title タスク依存関係管理 シーケンス図
+
+actor User
+participant Controller as "Task Controller"
+participant Service as "Task Service"
+participant Validator as "Dependency Validator"
+participant TaskRepo as "Task Repository"
+participant DepRepo as "Dependency Repository"
+participant CCPMService as "CCPM Service"
+database Database
+
+== タスク依存関係追加 ==
+User -> Controller: POST /api/v1/tasks/{id}/dependencies
+note right: タスクに依存関係を追加
+activate Controller
+
+Controller -> Service: addTaskDependency(taskId, dependencyData)
+activate Service
+
+== バリデーションフェーズ ==
+Service -> Validator: checkCircularDependency(taskId, predecessorId)
+activate Validator
+
+Validator -> TaskRepo: getDependencyGraph(projectId)
+activate TaskRepo
+TaskRepo -> Database: SELECT task dependencies
+Database --> TaskRepo: dependency data
+TaskRepo --> Validator: DependencyGraph
+deactivate TaskRepo
+
+Validator -> Validator: performDFS(graph, taskId, predecessorId)
+note right: 深度優先探索で循環参照チェック
+
+alt 循環参照が発見された場合
+    Validator --> Service: throw CircularDependencyError
+    Service --> Controller: error response
+    Controller --> User: 422 Validation Error
+else 循環参照なし
+    Validator --> Service: validation passed
+    deactivate Validator
+end
+
+== 依存関係作成フェーズ ==
+Service -> DepRepo: createDependency(taskId, dependencyData)
+activate DepRepo
+DepRepo -> Database: INSERT task_dependency
+Database --> DepRepo: success
+DepRepo --> Service: TaskDependency
+deactivate DepRepo
+
+== スケジュール再計算フェーズ ==
+Service -> CCPMService: recalculateProject(projectId)
+activate CCPMService
+
+CCPMService -> TaskRepo: getProjectTasks(projectId)
+activate TaskRepo
+TaskRepo -> Database: SELECT updated tasks
+Database --> TaskRepo: task data
+TaskRepo --> CCPMService: Task[]
+deactivate TaskRepo
+
+CCPMService -> CCPMService: calculateNewSchedule()
+CCPMService -> TaskRepo: updateTaskSchedules(updatedTasks)
+activate TaskRepo
+TaskRepo -> Database: UPDATE task dates
+Database --> TaskRepo: success
+TaskRepo --> CCPMService: updated
+deactivate TaskRepo
+
+CCPMService --> Service: recalculation complete
+deactivate CCPMService
+
+Service --> Controller: dependency added successfully
+deactivate Service
+
+Controller --> User: 201 Created
+deactivate Controller
+
+== 依存関係削除 ==
+User -> Controller: DELETE /api/v1/tasks/{id}/dependencies/{depId}
+activate Controller
+
+Controller -> Service: removeDependency(taskId, dependencyId)
+activate Service
+
+Service -> DepRepo: deleteDependency(dependencyId)
+activate DepRepo
+DepRepo -> Database: DELETE FROM task_dependencies
+Database --> DepRepo: success
+DepRepo --> Service: deleted
+deactivate DepRepo
+
+Service -> CCPMService: recalculateProject(projectId)
+activate CCPMService
+note right: スケジュール再計算
+CCPMService --> Service: recalculation complete
+deactivate CCPMService
+
+Service --> Controller: dependency removed
+deactivate Service
+
+Controller --> User: 204 No Content
+deactivate Controller
+
+== 複雑な依存関係の処理 ==
+note over Validator: 複雑なケース
+User -> Controller: POST /api/v1/tasks/{id}/dependencies
+Controller -> Service: addTaskDependency(taskId, complexDependency)
+Service -> Validator: validateComplexDependency()
+
+Validator -> Validator: checkMultiplePredecessors()
+Validator -> Validator: checkLagConstraints()
+Validator -> Validator: checkResourceConflicts()
+
+alt 複雑な制約違反
+    Validator --> Service: throw ComplexConstraintError
+    Service --> Controller: detailed error response
+    Controller --> User: 422 with detailed validation errors
+else 全ての制約を満たす
+    Validator --> Service: complex validation passed
+    note right: 通常の作成フローに続く
+end
+
+@enduml

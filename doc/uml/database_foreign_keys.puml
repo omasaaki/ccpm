@@ -1,0 +1,101 @@
+@startuml Foreign Key Constraints
+title CCPM システム - 外部キー制約図
+
+package "Core Tables" {
+  class organizations {
+    +id: UUID (PK)
+    name: VARCHAR
+    plan: VARCHAR
+  }
+  
+  class users {
+    +id: UUID (PK)
+    organization_id: UUID (FK)
+    user_id: VARCHAR
+    email: VARCHAR
+  }
+  
+  class projects {
+    +id: UUID (PK)
+    organization_id: UUID (FK)
+    owner_id: UUID (FK)
+    name: VARCHAR
+  }
+  
+  class tasks {
+    +id: UUID (PK)
+    project_id: UUID (FK)
+    assignee_id: UUID (FK)
+    name: VARCHAR
+  }
+}
+
+package "Relationship Tables" {
+  class project_members {
+    +id: UUID (PK)
+    project_id: UUID (FK)
+    user_id: UUID (FK)
+    role: VARCHAR
+  }
+  
+  class task_dependencies {
+    +id: UUID (PK)
+    task_id: UUID (FK)
+    predecessor_id: UUID (FK)
+    dependency_type: VARCHAR
+  }
+  
+  class user_sessions {
+    +id: UUID (PK)
+    user_id: UUID (FK)
+    token_hash: VARCHAR
+  }
+}
+
+package "CCPM Tables" {
+  class critical_chains {
+    +id: UUID (PK)
+    project_id: UUID (FK)
+    task_sequence: TEXT
+  }
+  
+  class buffers {
+    +id: UUID (PK)
+    project_id: UUID (FK)
+    type: VARCHAR
+    size_hours: DECIMAL
+  }
+  
+  class buffer_consumptions {
+    +id: UUID (PK)
+    buffer_id: UUID (FK)
+    consumed_hours: DECIMAL
+  }
+  
+  class project_snapshots {
+    +id: UUID (PK)
+    project_id: UUID (FK)
+    progress_rate: DECIMAL
+  }
+}
+
+' Foreign Key Constraints
+organizations ||--o{ users : "FK: organization_id"
+organizations ||--o{ projects : "FK: organization_id"
+users ||--o{ projects : "FK: owner_id"
+users ||--o{ user_sessions : "FK: user_id"
+users ||--o{ project_members : "FK: user_id"
+users ||--o{ tasks : "FK: assignee_id"
+projects ||--o{ project_members : "FK: project_id"
+projects ||--o{ tasks : "FK: project_id"
+projects ||--|| critical_chains : "FK: project_id"
+projects ||--o{ buffers : "FK: project_id"
+projects ||--o{ project_snapshots : "FK: project_id"
+tasks ||--o{ task_dependencies : "FK: task_id"
+tasks ||--o{ task_dependencies : "FK: predecessor_id"
+buffers ||--o{ buffer_consumptions : "FK: buffer_id"
+
+note top of organizations : Reference Table\n(No Foreign Keys)
+note bottom of buffer_consumptions : Leaf Table\n(Only Foreign Keys)
+
+@enduml

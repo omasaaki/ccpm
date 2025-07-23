@@ -1,0 +1,193 @@
+@startuml Domain Models Class Diagram
+title CCPM システム - ドメインモデル クラス図
+
+package "Domain Models" {
+    class User {
+        - id: string
+        - userId: string
+        - email: string
+        - firstName: string
+        - lastName: string
+        - passwordHash: string
+        - role: UserRole
+        - language: Language
+        - isActive: boolean
+        - lastLoginAt: Date
+        - createdAt: Date
+        - updatedAt: Date
+        --
+        + authenticate(password: string): boolean
+        + changePassword(newPassword: string): void
+        + hasPermission(permission: string): boolean
+        + getFullName(): string
+    }
+
+    class Project {
+        - id: string
+        - name: string
+        - description: string
+        - startDate: Date
+        - endDate: Date
+        - status: ProjectStatus
+        - ownerId: string
+        - organizationId: string
+        - createdAt: Date
+        - updatedAt: Date
+        --
+        + calculateProgress(): number
+        + isOverdue(): boolean
+        + getDuration(): number
+        + addTask(task: Task): void
+        + removeTask(taskId: string): void
+        + updateStatus(status: ProjectStatus): void
+    }
+
+    class Task {
+        - id: string
+        - projectId: string
+        - name: string
+        - description: string
+        - estimatedHours: number
+        - actualHours: number
+        - startDate: Date
+        - endDate: Date
+        - status: TaskStatus
+        - priority: TaskPriority
+        - assigneeId: string
+        - progressRate: number
+        - createdAt: Date
+        - updatedAt: Date
+        --
+        + calculateProgressRate(): number
+        + isOnCriticalChain(): boolean
+        + canStart(): boolean
+        + updateProgress(hours: number): void
+        + complete(): void
+        + getDuration(): number
+        + isOverdue(): boolean
+    }
+
+    class TaskDependency {
+        - id: string
+        - taskId: string
+        - predecessorId: string
+        - dependencyType: DependencyType
+        - lagDays: number
+        --
+        + calculateStartDate(predecessorEnd: Date): Date
+    }
+
+    class CriticalChain {
+        - id: string
+        - projectId: string
+        - taskSequence: string[]
+        - totalDuration: number
+        - isCurrent: boolean
+        - calculatedAt: Date
+        --
+        + getTasks(): Task[]
+        + recalculate(): void
+        + getBottleneck(): Task
+    }
+
+    class Buffer {
+        - id: string
+        - projectId: string
+        - type: BufferType
+        - sizeHours: number
+        - consumedHours: number
+        - position: number
+        - chainId: string
+        --
+        + getConsumptionRate(): number
+        + consume(hours: number): void
+        + getRemaining(): number
+        + getStatus(): BufferStatus
+    }
+
+    class Organization {
+        - id: string
+        - name: string
+        - plan: PlanType
+        - maxUsers: number
+        - maxProjects: number
+        - isActive: boolean
+        --
+        + canAddUser(): boolean
+        + canAddProject(): boolean
+    }
+
+    enum UserRole {
+        ADMIN
+        MANAGER
+        USER
+        VIEWER
+    }
+
+    enum ProjectStatus {
+        PLANNING
+        ACTIVE
+        ON_HOLD
+        COMPLETED
+        CANCELLED
+    }
+
+    enum TaskStatus {
+        TODO
+        IN_PROGRESS
+        REVIEW
+        DONE
+        CANCELLED
+    }
+
+    enum TaskPriority {
+        LOW
+        MEDIUM
+        HIGH
+        CRITICAL
+    }
+
+    enum DependencyType {
+        FS
+        FF
+        SS
+        SF
+    }
+
+    enum BufferType {
+        PROJECT
+        FEEDING
+        RESOURCE
+    }
+
+    enum BufferStatus {
+        GREEN
+        YELLOW
+        RED
+    }
+
+    enum Language {
+        JA
+        EN
+    }
+
+    enum PlanType {
+        FREE
+        BASIC
+        PROFESSIONAL
+        ENTERPRISE
+    }
+
+    ' Relationships
+    User "1" --o "0..*" Project : owns
+    Project "1" *-- "0..*" Task : contains
+    Task "1" o-- "0..*" TaskDependency : has dependencies
+    Task "0..*" -- "1" User : assigned to
+    Project "1" -- "0..1" CriticalChain : has current
+    Project "1" *-- "0..*" Buffer : has buffers
+    Buffer "0..*" -- "1" CriticalChain : associated with
+    Organization "1" *-- "0..*" User : has members
+    Organization "1" *-- "0..*" Project : owns projects
+}
+
+@enduml

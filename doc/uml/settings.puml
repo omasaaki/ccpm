@@ -1,0 +1,56 @@
+@startsalt
+{
+  {* CCPM - Settings (Web) | 🔔 3 | 👤 田中太郎 ▼ | 🌐 JP ▼ }
+  ==
+  {T
+    + 📊 Dashboard
+    + 📁 Projects
+    + 📋 Tasks
+    + 📈 Analytics
+    + 📊 Reports
+    + ⚙️ Settings
+    ++ <b>Profile</b>
+    ++ Notifications
+    ++ Security
+    ++ Preferences
+    |
+    {
+      {/ <b>User Profile Settings</b> }
+      ==
+      {
+        <b>Basic Information</b>
+        --
+        User ID: U001 (Cannot be changed)
+        --
+        First Name: "太郎                    "
+        Last Name: "田中                    "
+        Email: "tanaka@example.com      "
+        --
+        <b>Organization</b>
+        --
+        Department: ^IT Department^
+        Role: ^Project Manager^
+        --
+        <b>Contact Information</b>
+        --
+        Phone: "+81-90-1234-5678       "
+        Alternative Email: "tanaka.alt@example.com "
+        --
+        <b>Language & Region</b>
+        --
+        Language: ^Japanese^ | Timezone: ^Asia/Tokyo^
+        Date Format: ^YYYY-MM-DD^ | Time Format: ^24 Hour^
+        --
+        <b>Profile Picture</b>
+        --
+        [Current Avatar Image]
+        [ Choose File ] | [ Remove ]
+        --
+        [ Save Changes ] | [ Cancel ]
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System | Last updated: 2025-01-20 14:30 }
+}
+@endsalt

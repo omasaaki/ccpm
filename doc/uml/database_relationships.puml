@@ -1,0 +1,118 @@
+@startuml Database Relationships
+title CCPM システム - テーブル間関係図
+
+entity "organizations" as org {
+  * id : UUID [PK]
+  --
+  name : VARCHAR
+  plan : VARCHAR
+  max_users : INTEGER
+  max_projects : INTEGER
+}
+
+entity "users" as user {
+  * id : UUID [PK]
+  --
+  * organization_id : UUID [FK]
+  user_id : VARCHAR
+  email : VARCHAR
+  role : VARCHAR
+}
+
+entity "user_sessions" as session {
+  * id : UUID [PK]
+  --
+  * user_id : UUID [FK]
+  token_hash : VARCHAR
+  expires_at : TIMESTAMP
+}
+
+entity "projects" as proj {
+  * id : UUID [PK]
+  --
+  * organization_id : UUID [FK]
+  * owner_id : UUID [FK]
+  name : VARCHAR
+  start_date : DATE
+  end_date : DATE
+}
+
+entity "project_members" as member {
+  * id : UUID [PK]
+  --
+  * project_id : UUID [FK]
+  * user_id : UUID [FK]
+  role : VARCHAR
+}
+
+entity "tasks" as task {
+  * id : UUID [PK]
+  --
+  * project_id : UUID [FK]
+  * assignee_id : UUID [FK]
+  name : VARCHAR
+  estimated_hours : DECIMAL
+  actual_hours : DECIMAL
+}
+
+entity "task_dependencies" as dep {
+  * id : UUID [PK]
+  --
+  * task_id : UUID [FK]
+  * predecessor_id : UUID [FK]
+  dependency_type : VARCHAR
+  lag_days : INTEGER
+}
+
+entity "critical_chains" as chain {
+  * id : UUID [PK]
+  --
+  * project_id : UUID [FK]
+  task_sequence : TEXT
+  total_duration : DECIMAL
+  is_current : BOOLEAN
+}
+
+entity "buffers" as buffer {
+  * id : UUID [PK]
+  --
+  * project_id : UUID [FK]
+  type : VARCHAR
+  size_hours : DECIMAL
+  position : INTEGER
+}
+
+entity "buffer_consumptions" as consumption {
+  * id : UUID [PK]
+  --
+  * buffer_id : UUID [FK]
+  consumed_hours : DECIMAL
+  consumption_date : DATE
+}
+
+entity "project_snapshots" as snapshot {
+  * id : UUID [PK]
+  --
+  * project_id : UUID [FK]
+  progress_rate : DECIMAL
+  buffer_consumption_rate : DECIMAL
+  snapshot_date : DATE
+}
+
+' 1:N relationships
+org ||--o{ user : "has members"
+org ||--o{ proj : "owns projects"
+user ||--o{ session : "has sessions"
+user ||--o{ proj : "owns projects"
+proj ||--o{ member : "has members"
+proj ||--o{ task : "contains tasks"
+proj ||--|| chain : "has critical chain"
+proj ||--o{ buffer : "has buffers"
+proj ||--o{ snapshot : "has snapshots"
+user ||--o{ member : "participates in"
+user ||--o{ task : "assigned to"
+task ||--o{ dep : "has dependencies"
+task ||--o{ dep : "predecessor of"
+buffer ||--o{ consumption : "tracks consumption"
+
+@enduml

@@ -1,0 +1,61 @@
+@startuml Layer Architecture
+title CCPM システム - レイヤー構成図
+
+package "Frontend" {
+    package "Presentation Layer" {
+        [React Components] as Components
+        [Material-UI] as MUI
+        [Custom Hooks] as Hooks
+    }
+    
+    package "State Management" {
+        [Redux Store] as Redux
+        [RTK Query] as RTKQuery
+    }
+    
+    package "Service Layer" {
+        [API Client] as APIClient
+        [WebSocket Client] as WSClient
+    }
+}
+
+package "Backend" {
+    package "API Layer" {
+        [Express Routes] as Routes
+        [Middleware] as Middleware
+        [Validation] as Validation
+    }
+    
+    package "Business Logic Layer" {
+        [Service Classes] as Services
+        [Domain Models] as DomainModels
+        [CCPM Calculator] as Calculator
+    }
+    
+    package "Data Access Layer" {
+        [Repository Pattern] as Repository
+        [Prisma ORM] as Prisma
+    }
+    
+    package "Infrastructure Layer" {
+        [Database Connection] as DBConnection
+        [Logging] as Logging
+    }
+}
+
+package "Database Layer" {
+    database "PostgreSQL" as PostgreSQL
+}
+
+Components --> Redux
+Hooks --> APIClient
+APIClient --> Routes
+Routes --> Middleware
+Middleware --> Services
+Services --> Calculator
+Services --> Repository
+Repository --> Prisma
+Prisma --> DBConnection
+DBConnection --> PostgreSQL
+
+@enduml

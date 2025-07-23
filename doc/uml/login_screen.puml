@@ -1,0 +1,35 @@
+@startsalt
+{
+  {* 
+    CCPM - Critical Chain Project Management System (Web)
+  }
+  ==
+  {
+    . | . | .
+    {
+      {/ <b>Login</b> }
+      ==
+      {
+        User ID
+        "user123                                    "
+        --
+        Password  
+        "••••••••••••••••••••                      " | [👁]
+        --
+        [X] Remember me | "Forgot Password?"
+        --
+        {
+          [ Sign In                                  ]
+        }
+        --
+        Don't have an account? "Sign Up"
+        --
+        Language: ^Japanese^ | ^English^
+      }
+    }
+    . | . | .
+  }
+  ==
+  {* © 2025 CCPM System | Privacy Policy | Terms of Service }
+}
+@endsalt

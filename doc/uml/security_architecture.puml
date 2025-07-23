@@ -1,0 +1,128 @@
+@startuml security_architecture
+title CCPMシステム セキュリティアーキテクチャ
+
+!define PRIMARY_COLOR #2E86AB
+!define SECONDARY_COLOR #A23B72
+!define SUCCESS_COLOR #F18F01
+!define WARNING_COLOR #C73E1D
+
+' 外部境界
+package "外部ネットワーク" {
+  [ユーザー端末] as Client
+  [攻撃者] as Attacker #red
+}
+
+' DMZ層
+package "DMZ (非武装地帯)" {
+  [CDN/CloudFlare] as CDN
+  [ロードバランサー] as LB
+  [WAF] as WAF
+  [SSL終端] as SSL
+}
+
+' セキュリティ層
+package "セキュリティ層" {
+  [認証ゲートウェイ] as AuthGW
+  [API Gateway] as APIGW
+  [レート制限] as RateLimit
+  [IP制限] as IPFilter
+}
+
+' アプリケーション層
+package "アプリケーション層" {
+  [認証サービス] as AuthService
+  [認可サービス] as AuthzService
+  [ユーザー管理] as UserService
+  [プロジェクト管理] as ProjectService
+  [CCPM Engine] as CCPMEngine
+}
+
+' データアクセス層
+package "データアクセス層" {
+  [OLM (Prisma)] as ORM
+  [データ暗号化] as DataEncryption
+  [監査ログ] as AuditLog
+}
+
+' データ層
+package "データ層" {
+  database "PostgreSQL\n(TDE有効)" as DB
+  database "Redis\n(セッション)" as Redis
+  database "監査ログDB" as AuditDB
+}
+
+' セキュリティ監視
+package "セキュリティ監視" {
+  [SIEM] as SIEM
+  [IDS/IPS] as IDS
+  [脆弱性スキャナー] as VulnScanner
+  [ログ収集] as LogCollector
+}
+
+' 外部セキュリティサービス
+package "外部セキュリティサービス" {
+  [MFA Provider] as MFA
+  [PKI/証明書局] as PKI
+  [脅威インテリジェンス] as ThreatIntel
+}
+
+' 接続関係
+Client --> CDN : HTTPS
+CDN --> LB : SSL/TLS 1.3
+LB --> WAF : 負荷分散
+WAF --> SSL : フィルタリング
+SSL --> AuthGW : SSL終端
+
+AuthGW --> APIGW : 認証済み
+APIGW --> RateLimit : API制御
+RateLimit --> IPFilter : レート制限
+IPFilter --> AuthService : IP制限
+
+AuthService --> MFA : 多要素認証
+AuthService --> Redis : セッション管理
+AuthzService --> UserService : 権限確認
+UserService --> ORM : データアクセス
+
+ORM --> DataEncryption : 暗号化処理
+DataEncryption --> DB : 暗号化データ
+AuditLog --> AuditDB : 監査記録
+
+' セキュリティ監視
+LogCollector --> SIEM : ログ転送
+SIEM --> IDS : 脅威検知
+VulnScanner --> DB : 脆弱性検査
+ThreatIntel --> WAF : 脅威情報更新
+
+' 攻撃パターン (赤線)
+Attacker -[#red]-> CDN : "DDoS攻撃"
+Attacker -[#red]-> WAF : "SQLインジェクション"
+Attacker -[#red]-> AuthGW : "認証バイパス"
+
+' セキュリティ統制 (緑線)
+WAF -[#green]-> Attacker : "攻撃遮断"
+AuthGW -[#green]-> Attacker : "認証失敗"
+RateLimit -[#green]-> Attacker : "レート制限"
+
+' セキュリティレベル表示
+note right of CDN
+  セキュリティレベル: L1
+  - DDoS保護
+  - SSL/TLS暗号化
+  - 地理的制限
+end note
+
+note right of AuthGW
+  セキュリティレベル: L2
+  - JWT認証
+  - MFA対応
+  - セッション管理
+end note
+
+note right of DataEncryption
+  セキュリティレベル: L3
+  - AES-256-GCM
+  - キーローテーション
+  - 保存時暗号化
+end note
+
+@enduml

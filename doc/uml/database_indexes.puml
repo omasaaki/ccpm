@@ -1,0 +1,89 @@
+@startsalt
+{
+  {/ <b>CCPM Database Index Design</b> }
+  ==
+  {T
+    <b>Primary Keys</b>
+    • All tables: id (UUID)
+    |
+    <b>Unique Indexes</b>
+    --
+    users:
+    • user_id (WHERE deleted_at IS NULL)
+    • email (WHERE deleted_at IS NULL)
+    --
+    project_members:
+    • (project_id, user_id)
+    --
+    task_dependencies:
+    • (predecessor_id, successor_id)
+    --
+    task_resources:
+    • (task_id, resource_id)
+  }
+  ==
+  {T
+    <b>Performance Indexes</b>
+    |
+    <b>Frequently Queried Columns</b>
+    --
+    users:
+    • role, is_active
+    --
+    projects:
+    • organization_id, owner_id
+    • status, (start_date, end_date)
+    --
+    tasks:
+    • project_id, assignee_id
+    • status, (start_date, end_date)
+    --
+    task_dependencies:
+    • successor_id
+    --
+    resources:
+    • organization_id, type, is_active
+    --
+    task_resources:
+    • resource_id
+    --
+    buffers:
+    • project_id, type
+    --
+    critical_chains:
+    • project_id, is_current
+    --
+    progress_reports:
+    • project_id, task_id, reported_at
+  }
+  ==
+  {T
+    <b>Composite Indexes</b>
+    |
+    <b>Multi-Column Indexes</b>
+    --
+    projects:
+    • (organization_id, status)
+    • (owner_id, status)
+    --
+    tasks:
+    • (project_id, status)
+    • (assignee_id, status)
+    • (project_id, start_date)
+    --
+    progress_reports:
+    • (task_id, reported_at)
+    • (project_id, reported_at)
+    --
+    <b>Partial Indexes</b>
+    --
+    All tables with deleted_at:
+    • Active records only
+    • (WHERE deleted_at IS NULL)
+    --
+    critical_chains:
+    • Current chains only
+    • (WHERE is_current = true)
+  }
+}
+@endsalt

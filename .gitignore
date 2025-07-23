@@ -1,0 +1,310 @@
+# ===============================================
+# CCPM Project .gitignore
+# ===============================================
+
+# ===== Node.js =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output
+
+# Instrumentation
+.istanbul.yml
+
+# Dependency directories
+jspm_packages/
+
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# ===== Environment Variables =====
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging
+
+# ===== Database =====
+# PostgreSQL
+*.pgsql
+*.sql.backup
+pg_data/
+postgres-data/
+
+# Database dumps
+*.dump
+*.backup
+
+# Prisma
+# Keep schema.prisma but ignore generated files
+prisma/migrations/
+.env
+
+# ===== Build Output =====
+build/
+dist/
+out/
+.next/
+.vercel/
+.nuxt/
+
+# ===== Logs =====
+logs/
+*.log
+log/
+*.log.*
+
+# ===== Runtime & Cache =====
+.cache/
+.parcel-cache/
+.vscode-test/
+
+# ===== React & Frontend =====
+# React build
+/build
+/dist
+
+# Storybook
+.out
+.storybook-out
+storybook-static/
+
+# ===== Docker =====
+# Docker volumes
+docker-data/
+.docker/
+docker-compose.override.yml
+
+# ===== IDE & Editor =====
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===== OS Generated Files =====
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===== Security & Secrets =====
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# JWT Keys
+jwt-*.json
+private-key*
+public-key*
+
+# API Keys
+api-keys/
+secrets/
+.secrets
+
+# ===== Testing =====
+# Test results
+test-results/
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Jest
+jest_*/
+.jest/
+
+# ===== Deployment =====
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# AWS
+.aws/
+
+# Heroku
+.heroku/
+
+# ===== Monitoring & Analytics =====
+# Sentry
+.sentryclirc
+
+# New Relic
+newrelic.ini
+
+# ===== Project Specific =====
+# CCPM specific temporary files
+temp/
+tmp/
+*.tmp
+
+# Generated documentation
+generated-docs/
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# PlantUML temporary files (keep generated PNGs)
+*.puml~
+
+# Project management exports
+project_management/exports/
+
+# User uploaded files (if any)
+uploads/
+user-files/
+
+# ===== Keep These Files =====
+# Important: DO NOT ignore these
+!.gitkeep
+!README.md
+!package.json
+!package-lock.json
+!yarn.lock
+!tsconfig.json
+!.eslintrc.*
+!.prettierrc.*
+!docker-compose.yml
+!Dockerfile
+!CLAUDE.md
+!CHANGELOG
+!/doc/**/*.md
+!/doc/images/*.png
+!/doc/uml/*.puml
+!/project_management/**/*.md
+
+# ===== Development Tools =====
+# Webpack
+.webpack/
+
+# Rollup
+.rollup.cache/
+
+# Parcel
+.parcel-cache/
+
+# SWC
+.swc/
+
+# Turborepo
+.turbo/
+
+# ===== Miscellaneous =====
+# Temporary files
+*.tmp
+*.temp
+temp.*
+tmp.*
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Large files that shouldn't be in git
+*.iso
+*.dmg
+*.img
+
+# ===== Comments =====
+# This .gitignore is configured for the CCPM project
+# Technology stack: TypeScript, Node.js, React, PostgreSQL, Docker
+# Generated: 2025-01-22

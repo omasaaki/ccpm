@@ -1,0 +1,174 @@
+@startuml Service Layer Class Diagram
+title CCPM システム - サービス層 クラス図
+
+package "Service Layer" {
+    interface IAuthService {
+        + login(userId: string, password: string): Promise<AuthResult>
+        + logout(token: string): Promise<void>
+        + refreshToken(refreshToken: string): Promise<TokenPair>
+        + validateToken(token: string): Promise<User>
+    }
+
+    class AuthService {
+        - userRepository: IUserRepository
+        - jwtService: IJwtService
+        - passwordService: IPasswordService
+        --
+        + login(userId: string, password: string): Promise<AuthResult>
+        + logout(token: string): Promise<void>
+        + refreshToken(refreshToken: string): Promise<TokenPair>
+        + validateToken(token: string): Promise<User>
+        - generateTokens(user: User): TokenPair
+        - verifyPassword(password: string, hash: string): boolean
+    }
+
+    interface IProjectService {
+        + createProject(data: CreateProjectRequest): Promise<Project>
+        + getProject(id: string): Promise<Project>
+        + updateProject(id: string, data: UpdateProjectRequest): Promise<Project>
+        + deleteProject(id: string): Promise<void>
+        + listProjects(filter: ProjectFilter): Promise<Project[]>
+    }
+
+    class ProjectService {
+        - projectRepository: IProjectRepository
+        - taskRepository: ITaskRepository
+        - notificationService: INotificationService
+        --
+        + createProject(data: CreateProjectRequest): Promise<Project>
+        + getProject(id: string): Promise<Project>
+        + updateProject(id: string, data: UpdateProjectRequest): Promise<Project>
+        + deleteProject(id: string): Promise<void>
+        + listProjects(filter: ProjectFilter): Promise<Project[]>
+        - validateProjectData(data: CreateProjectRequest): void
+        - setupDefaultSettings(projectId: string): Promise<void>
+    }
+
+    interface ICCPMService {
+        + calculateCriticalChain(projectId: string): Promise<CriticalChain>
+        + calculateBuffers(projectId: string): Promise<Buffer[]>
+        + getFeverChartData(projectId: string): Promise<FeverChartData>
+        + getBufferTrendData(projectId: string): Promise<BufferTrendData>
+    }
+
+    class CCPMService {
+        - projectRepository: IProjectRepository
+        - taskRepository: ITaskRepository
+        - bufferRepository: IBufferRepository
+        - ccpmCalculator: CCPMCalculator
+        --
+        + calculateCriticalChain(projectId: string): Promise<CriticalChain>
+        + calculateBuffers(projectId: string): Promise<Buffer[]>
+        + getFeverChartData(projectId: string): Promise<FeverChartData>
+        + getBufferTrendData(projectId: string): Promise<BufferTrendData>
+        - recalculateOnTaskChange(taskId: string): Promise<void>
+    }
+
+    class CCPMCalculator {
+        --
+        + calculateCriticalChain(tasks: Task[]): CriticalChain
+        + calculateBuffers(criticalChain: Task[]): Buffer[]
+        + calculateBufferConsumption(buffer: Buffer): number
+        + getFeverZone(progressRate: number, bufferConsumption: number): FeverZone
+        - findLongestPath(tasks: Task[]): Task[]
+        - applyResourceConstraints(tasks: Task[]): Task[]
+        - calculateProjectBuffer(tasks: Task[]): number
+        - calculateFeedingBuffers(tasks: Task[]): Buffer[]
+    }
+
+    interface ITaskService {
+        + createTask(data: CreateTaskRequest): Promise<Task>
+        + getTask(id: string): Promise<Task>
+        + updateTask(id: string, data: UpdateTaskRequest): Promise<Task>
+        + deleteTask(id: string): Promise<void>
+        + addDependency(taskId: string, dependency: TaskDependencyRequest): Promise<void>
+        + removeDependency(taskId: string, dependencyId: string): Promise<void>
+    }
+
+    class TaskService {
+        - taskRepository: ITaskRepository
+        - dependencyRepository: IDependencyRepository
+        - ccmpService: ICCPMService
+        --
+        + createTask(data: CreateTaskRequest): Promise<Task>
+        + getTask(id: string): Promise<Task>
+        + updateTask(id: string, data: UpdateTaskRequest): Promise<Task>
+        + deleteTask(id: string): Promise<void>
+        + addDependency(taskId: string, dependency: TaskDependencyRequest): Promise<void>
+        + removeDependency(taskId: string, dependencyId: string): Promise<void>
+        - checkCircularDependency(taskId: string, predecessorId: string): Promise<void>
+        - recalculateSchedule(projectId: string): Promise<void>
+    }
+
+    interface IReportService {
+        + generateProjectReport(projectId: string, format: ReportFormat): Promise<Report>
+        + generateResourceReport(filter: ResourceFilter): Promise<Report>
+        + getProgressSummary(projectId: string): Promise<ProgressSummary>
+    }
+
+    class ReportService {
+        - projectRepository: IProjectRepository
+        - taskRepository: ITaskRepository
+        - reportGenerator: IReportGenerator
+        --
+        + generateProjectReport(projectId: string, format: ReportFormat): Promise<Report>
+        + generateResourceReport(filter: ResourceFilter): Promise<Report>
+        + getProgressSummary(projectId: string): Promise<ProgressSummary>
+        - aggregateProjectData(projectId: string): Promise<ProjectAggregateData>
+    }
+
+    ' Utility Services
+    interface INotificationService {
+        + sendNotification(notification: Notification): Promise<void>
+        + subscribeToProject(userId: string, projectId: string): Promise<void>
+    }
+
+    interface IJwtService {
+        + generateToken(payload: any, expiresIn: string): string
+        + verifyToken(token: string): any
+    }
+
+    interface IPasswordService {
+        + hashPassword(password: string): Promise<string>
+        + comparePassword(password: string, hash: string): Promise<boolean>
+    }
+
+    ' Service implementations implement interfaces
+    AuthService ..|> IAuthService
+    ProjectService ..|> IProjectService
+    CCPMService ..|> ICCPMService
+    TaskService ..|> ITaskService
+    ReportService ..|> IReportService
+
+    ' Service dependencies
+    AuthService --> IUserRepository
+    AuthService --> IJwtService
+    AuthService --> IPasswordService
+    
+    ProjectService --> IProjectRepository
+    ProjectService --> ITaskRepository
+    ProjectService --> INotificationService
+    
+    CCPMService --> IProjectRepository
+    CCPMService --> ITaskRepository
+    CCPMService --> IBufferRepository
+    CCPMService --> CCPMCalculator
+    
+    TaskService --> ITaskRepository
+    TaskService --> IDependencyRepository
+    TaskService --> ICCPMService
+    
+    ReportService --> IProjectRepository
+    ReportService --> ITaskRepository
+    ReportService --> IReportGenerator
+}
+
+' Repository Interfaces (referenced)
+interface IUserRepository
+interface IProjectRepository
+interface ITaskRepository
+interface IBufferRepository
+interface IDependencyRepository
+interface IReportGenerator
+
+@enduml

@@ -1,0 +1,102 @@
+@startsalt
+{
+  {/ <b>CCPM Database Table Structures</b> }
+  ==
+  {T
+    <b>Core Tables</b>
+    + users
+    + organizations  
+    + projects
+    + project_members
+    + tasks
+    |
+    {
+      <b>users (ユーザー管理)</b>
+      --
+      • id: UUID (PK)
+      • user_id: VARCHAR(50) (UK)
+      • email: VARCHAR(255) (UK)  
+      • password_hash: VARCHAR(255)
+      • first_name: VARCHAR(100)
+      • last_name: VARCHAR(100)
+      • role: VARCHAR(50) [ADMIN/MANAGER/USER]
+      • language: VARCHAR(10) [ja/en]
+      • is_active: BOOLEAN
+      • last_login_at: TIMESTAMP
+      • created_at/updated_at/deleted_at
+      --
+      <b>projects (プロジェクト管理)</b>
+      --
+      • id: UUID (PK)
+      • name: VARCHAR(200)
+      • description: TEXT
+      • start_date/end_date: DATE
+      • status: VARCHAR(50)
+      • organization_id: UUID (FK)
+      • owner_id: UUID (FK)
+      • created_at/updated_at/deleted_at
+      --
+      <b>tasks (タスク管理)</b>
+      --
+      • id: UUID (PK)
+      • project_id: UUID (FK)
+      • name: VARCHAR(200)
+      • estimated_hours/actual_hours: DECIMAL
+      • start_date/end_date: DATE
+      • status: VARCHAR(50)
+      • assignee_id/created_by: UUID (FK)
+      • created_at/updated_at/deleted_at
+    }
+  }
+  ==
+  {T
+    <b>CCMP Tables</b>
+    + task_dependencies
+    + resources
+    + task_resources
+    + buffers
+    + critical_chains
+    |
+    {
+      <b>task_dependencies (依存関係)</b>
+      --
+      • id: UUID (PK)
+      • predecessor_id: UUID (FK)
+      • successor_id: UUID (FK)
+      • dependency_type: VARCHAR(50) [FS/SS/FF/SF]
+      • lag_days: INTEGER
+      • created_at/updated_at
+      --
+      <b>buffers (バッファ管理)</b>
+      --
+      • id: UUID (PK)
+      • project_id: UUID (FK)
+      • type: VARCHAR(50) [PROJECT/FEEDING]
+      • size_hours: DECIMAL(8,2)
+      • consumed_hours: DECIMAL(8,2)
+      • position: INTEGER
+      • created_at/updated_at
+      --
+      <b>critical_chains (クリティカルチェーン)</b>
+      --
+      • id: UUID (PK)
+      • project_id: UUID (FK)
+      • task_sequence: JSONB
+      • total_duration: DECIMAL(8,2)
+      • is_current: BOOLEAN
+      • calculated_at: TIMESTAMP
+      • created_at/updated_at
+      --
+      <b>progress_reports (進捗レポート)</b>
+      --
+      • id: UUID (PK)
+      • project_id/task_id: UUID (FK)
+      • progress_rate: DECIMAL(5,2)
+      • reported_at: TIMESTAMP
+      • reporter_id: UUID (FK)
+      • comments: TEXT
+      • created_at/updated_at
+    }
+  }
+}
+@endsalt

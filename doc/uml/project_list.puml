@@ -1,0 +1,54 @@
+@startsalt
+{
+  {* CCPM - Project List | [ + New Project ] }
+  ==
+  {T
+    + 📊 Dashboard
+    + 📁 Projects
+    ++ <b>List</b>
+    ++ Gantt  
+    ++ Kanban
+    + 📋 Tasks
+    + 📈 Analytics
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      "🔍 Search projects...                    " | ^Filter ▼^ | ^Sort ▼^
+      --
+      {/ <b>Project Alpha</b> | <color:green>Active</color> }
+      {
+        Start: 2025-01-01 | Due: 2025-06-30
+        Progress: ████████░░ 80% | Buffer: <color:orange>⚠️ 80%</color>
+        Owner: 田中太郎 | Members: 5 people
+        --
+        [ View Details ] | [ Edit ]
+      }
+      --
+      {/ <b>Project Beta</b> | <color:blue>Planning</color> }
+      {
+        Start: 2025-02-01 | Due: 2025-08-31  
+        Progress: ████░░░░░░ 40% | Buffer: <color:green>✅ 40%</color>
+        Owner: 佐藤花子 | Members: 3 people
+        --
+        [ View Details ] | [ Edit ]
+      }
+      --
+      {/ <b>Project Gamma</b> | <color:gray>Completed</color> }
+      {
+        Start: 2024-10-01 | Due: 2024-12-31
+        Progress: ████████████ 100% | Buffer: <color:green>✅ 20%</color>
+        Owner: 鈴木次郎 | Members: 4 people
+        --
+        [ View Details ] | [ Archive ]
+      }
+      --
+      {
+        < Previous | Page 1 of 5 | Next >
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System }
+}
+@endsalt

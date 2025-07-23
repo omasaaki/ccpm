@@ -1,0 +1,51 @@
+@startsalt
+{
+  {* CCPM Dashboard | 🔔 3 | 👤 田中太郎 ▼ | 🌐 JP ▼ }
+  ==
+  {T
+    + 📊 Dashboard
+    ++ Overview
+    + 📁 Projects  
+    ++ List
+    ++ Gantt
+    ++ Kanban
+    + 📋 Tasks
+    + 📈 Analytics
+    ++ Critical Chain
+    ++ Buffer Analysis
+    ++ Fever Chart
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      {/ <b>Project Overview</b> }
+      {
+        Active: <b>5</b> | Completed: <b>2</b> | Delayed: <b>1</b>
+      }
+      --
+      {/ <b>⚠️ Projects Requiring Attention</b> }
+      {
+        [!] Project Alpha - Buffer consumption 80%
+        [!] Project Beta - Delay risk detected
+      }
+      --
+      {/ <b>Today's Tasks</b> }
+      {T
+        Task | Project | Progress | Status
+        Task A | Project X | ████████░░ 80% | In Progress
+        Task B | Project Y | ████████████ 100% | Due Today
+        Task C | Project Z | ░░░░░░░░░░ 0% | Not Started
+      }
+      --
+      {/ <b>Buffer Consumption Status</b> }
+      {
+        Project Alpha: ████████░░ 80% 
+        Project Beta:  █████░░░░░ 50%
+        Project Gamma: ███░░░░░░░ 30%
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System }
+}
+@endsalt

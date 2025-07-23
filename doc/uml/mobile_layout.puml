@@ -1,0 +1,29 @@
+@startsalt
+{
+  {* ☰ CCPM | 🔔 3 | 👤 }
+  ==
+  {
+    {/ <b>Dashboard</b> }
+    --
+    <b>Project Overview</b>
+    Active: 5 | Completed: 2 | Delayed: 1
+    --
+    <b>⚠️ Attention Required</b>
+    Project Alpha - Buffer 80%
+    Project Beta - Delay Risk
+    --
+    <b>Today's Tasks</b>
+    ☐ Task A - Project X (80%)
+    ☐ Task B - Project Y (Due Today)
+    ☐ Task C - Project Z (Not Started)
+    --
+    <b>Buffer Status</b>  
+    Alpha: ████████░░ 80%
+    Beta:  █████░░░░░ 50%
+  }
+  ==
+  {T
+    📊 Dashboard | 📁 Projects | 📋 Tasks | 📈 Analytics | ⚙️ More
+  }
+}
+@endsalt

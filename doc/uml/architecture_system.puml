@@ -1,0 +1,53 @@
+@startuml System Architecture
+title CCPM システム - 全体構成図
+
+package "Client Tier" {
+    [Web Browser\n(React.js)] as Browser
+    [Mobile App\n(Future)] as Mobile
+}
+
+package "Web Tier" {
+    [Load Balancer\n(nginx)] as LoadBalancer
+    [SSL Termination] as SSL
+}
+
+package "Application Tier" {
+    [Application Server\n(Node.js + Express.js)] as AppServer
+    [REST API] as API
+    [JWT Authentication] as JWT
+    [WebSocket] as WS
+}
+
+package "Business Logic Tier" {
+    [CCPM Engine] as CCPM
+    [User Management] as UserMgmt
+    [Project Management] as ProjectMgmt
+    [Task Management] as TaskMgmt
+    [Report Generator] as ReportGen
+}
+
+package "Data Tier" {
+    database "PostgreSQL" as DB
+}
+
+Browser --> SSL : HTTPS
+Mobile --> SSL : HTTPS
+SSL --> LoadBalancer
+LoadBalancer --> AppServer
+AppServer --> API
+AppServer --> JWT
+AppServer --> WS
+
+API --> CCPM
+API --> UserMgmt
+API --> ProjectMgmt
+API --> TaskMgmt
+API --> ReportGen
+
+CCPM --> DB
+UserMgmt --> DB
+ProjectMgmt --> DB
+TaskMgmt --> DB
+ReportGen --> DB
+
+@enduml

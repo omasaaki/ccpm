@@ -1,0 +1,73 @@
+@startsalt
+{
+  {* Project Alpha - バッファトレンドグラフ }
+  ==
+  {T
+    + 📊 Dashboard  
+    + 📁 Projects
+    + 📋 Tasks
+    + 📈 Analytics
+    ++ Critical Chain
+    ++ Buffer Analysis
+    ++ Fever Chart
+    ++ <b>Buffer Trend</b>
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      {/ <b>Buffer Consumption Trend vs Project Progress</b> }
+      --
+      {T
+        Buffer % | Buffer Trend Line                                    
+        100% | <color:red>🔥 RED ZONE</color>                           
+        90%  | ────────────────────────────────────●
+        80%  | ─────────────────────────────●─────
+        70%  | <color:orange>⚠️ YELLOW ZONE</color>      ●        
+        60%  | ─────────────────────●─────────────
+        50%  | ──────────────●──────────────────── 
+        40%  | ─────────●─────────────────────────
+        30%  | <color:green>✅ GREEN ZONE</color>                         
+        20%  | ────●───────────────────────────────
+        10%  | ●───────────────────────────────────
+        0%   | ────────────────────────────────────
+             | 0%  10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+             |              Project Progress Rate
+      }
+      --
+      {/ <b>Current Status Analysis</b> }
+      {
+        Current Progress: <b>75%</b>
+        Buffer Consumption: <b>90%</b>
+        Status: <color:red>🔥 Critical - Buffer Overrun</color>
+        --
+        <b>Trend History:</b>
+        • 0-20%: Good progress (GREEN ZONE)
+        • 20-40%: Optimal buffer usage
+        • 40-60%: Entered YELLOW ZONE - caution
+        • 60-75%: Critical RED ZONE - immediate action
+        --
+        <b>Key Insights:</b>
+        • Buffer consumption rate increasing
+        • Current trajectory unsustainable
+        • Project completion at risk
+      }
+      --
+      {/ <b>Comparison & Analysis</b> }
+      {
+        <b>Ideal vs Actual:</b>
+        Ideal Line: Linear progression (diagonal)
+        Actual: Exponential buffer consumption
+        Deviation: <color:red>+20% above warning threshold</color>
+        --
+        <b>Recovery Actions:</b>
+        • Critical path acceleration needed
+        • Resource reallocation required
+        • Scope reduction consideration
+        • Stakeholder escalation completed
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System }
+}
+@endsalt

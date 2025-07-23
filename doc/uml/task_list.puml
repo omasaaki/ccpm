@@ -1,0 +1,39 @@
+@startsalt
+{
+  {* CCPM - Task List (Web) | [ + New Task ] | 🔔 3 | 👤 田中太郎 ▼ | 🌐 JP ▼ }
+  ==
+  {T
+    + 📊 Dashboard
+    + 📁 Projects  
+    + 📋 Tasks
+    ++ <b>List</b>
+    ++ Board
+    ++ Calendar
+    + 📈 Analytics
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      {/ <b>Task List - All Projects</b> }
+      "🔍 Search tasks..." | ^Status: All^ | ^Priority: All^ | ^Assignee: All^ | [ Export CSV ]
+      ==
+      {T
+        [X] | ID | Task Name | Project | Status | Priority | Assignee | Due Date | Progress
+        [ ] | #101 | 画面設計レビュー | Project Alpha | TODO | <color:red>High</color> | 田中太郎 | 2025-01-25 | 0%
+        [ ] | #102 | API仕様書作成 | Project Alpha | TODO | <color:orange>Medium</color> | 佐藤花子 | 2025-01-28 | 0%
+        [ ] | #103 | データベース設計 | Project Alpha | IN_PROGRESS | <color:red>High</color> | 鈴木次郎 | 2025-01-24 | 60%
+        [ ] | #104 | 認証機能実装 | Project Beta | IN_PROGRESS | <color:red>High</color> | 山田太郎 | 2025-01-26 | 30%
+        [ ] | #105 | 要件定義書 | Project Alpha | REVIEW | <color:red>High</color> | 高橋花子 | 2025-01-23 | 100%
+        [X] | #106 | プロジェクト計画 | Project Alpha | DONE | <color:red>High</color> | 田中太郎 | 2025-01-22 | 100%
+        [X] | #107 | 環境構築 | Project Beta | DONE | <color:orange>Medium</color> | 佐藤花子 | 2025-01-21 | 100%
+      }
+      ==
+      {
+        [ Bulk Edit ] | [ Delete Selected ] | Showing 1-7 of 7 tasks | < Previous | Page 1 | Next >
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System | Total: 7 tasks | Completed: 2 (29%) | In Progress: 2 (29%) }
+}
+@endsalt

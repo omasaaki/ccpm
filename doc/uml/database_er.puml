@@ -1,0 +1,161 @@
+@startuml
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PK(x) <b><color:red>PK: x</color></b>
+!define FK(x) <color:blue>FK: x</color>
+!define UK(x) <color:green>UK: x</color>
+
+title CCPM Database ER Diagram
+
+TABLE(users, "users\nユーザー管理") {
+  PK(id: UUID)
+  UK(user_id: VARCHAR(50))
+  UK(email: VARCHAR(255))
+  password_hash: VARCHAR(255)
+  first_name: VARCHAR(100)
+  last_name: VARCHAR(100)
+  role: VARCHAR(50)
+  language: VARCHAR(10)
+  is_active: BOOLEAN
+  last_login_at: TIMESTAMP
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  deleted_at: TIMESTAMP
+}
+
+TABLE(organizations, "organizations\n組織管理") {
+  PK(id: UUID)
+  name: VARCHAR(200)
+  description: TEXT
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  deleted_at: TIMESTAMP
+}
+
+TABLE(projects, "projects\nプロジェクト管理") {
+  PK(id: UUID)
+  name: VARCHAR(200)
+  description: TEXT
+  start_date: DATE
+  end_date: DATE
+  status: VARCHAR(50)
+  FK(organization_id: UUID)
+  FK(owner_id: UUID)
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  deleted_at: TIMESTAMP
+}
+
+TABLE(project_members, "project_members\nプロジェクトメンバー") {
+  PK(id: UUID)
+  FK(project_id: UUID)
+  FK(user_id: UUID)
+  role: VARCHAR(50)
+  joined_at: TIMESTAMP
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+}
+
+TABLE(tasks, "tasks\nタスク管理") {
+  PK(id: UUID)
+  FK(project_id: UUID)
+  name: VARCHAR(200)
+  description: TEXT
+  estimated_hours: DECIMAL(8,2)
+  actual_hours: DECIMAL(8,2)
+  start_date: DATE
+  end_date: DATE
+  status: VARCHAR(50)
+  priority: VARCHAR(50)
+  FK(assignee_id: UUID)
+  FK(created_by: UUID)
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  deleted_at: TIMESTAMP
+}
+
+TABLE(task_dependencies, "task_dependencies\nタスク依存関係") {
+  PK(id: UUID)
+  FK(predecessor_id: UUID)
+  FK(successor_id: UUID)
+  dependency_type: VARCHAR(50)
+  lag_days: INTEGER
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+}
+
+TABLE(resources, "resources\nリソース管理") {
+  PK(id: UUID)
+  name: VARCHAR(200)
+  type: VARCHAR(50)
+  capacity: DECIMAL(5,2)
+  cost_per_hour: DECIMAL(10,2)
+  FK(organization_id: UUID)
+  is_active: BOOLEAN
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+  deleted_at: TIMESTAMP
+}
+
+TABLE(task_resources, "task_resources\nタスクリソース配分") {
+  PK(id: UUID)
+  FK(task_id: UUID)
+  FK(resource_id: UUID)
+  allocation_rate: DECIMAL(5,2)
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+}
+
+TABLE(buffers, "buffers\nバッファ管理") {
+  PK(id: UUID)
+  FK(project_id: UUID)
+  type: VARCHAR(50)
+  size_hours: DECIMAL(8,2)
+  consumed_hours: DECIMAL(8,2)
+  position: INTEGER
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+}
+
+TABLE(critical_chains, "critical_chains\nクリティカルチェーン") {
+  PK(id: UUID)
+  FK(project_id: UUID)
+  task_sequence: JSONB
+  total_duration: DECIMAL(8,2)
+  is_current: BOOLEAN
+  calculated_at: TIMESTAMP
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+}
+
+TABLE(progress_reports, "progress_reports\n進捗レポート") {
+  PK(id: UUID)
+  FK(project_id: UUID)
+  FK(task_id: UUID)
+  progress_rate: DECIMAL(5,2)
+  reported_at: TIMESTAMP
+  FK(reporter_id: UUID)
+  comments: TEXT
+  created_at: TIMESTAMP
+  updated_at: TIMESTAMP
+}
+
+' Relationships
+organizations ||--o{ projects : "1:N"
+users ||--o{ projects : "owner 1:N"
+users ||--o{ project_members : "1:N"
+projects ||--o{ project_members : "1:N"
+projects ||--o{ tasks : "1:N"
+users ||--o{ tasks : "assignee 1:N"
+users ||--o{ tasks : "creator 1:N"
+tasks ||--o{ task_dependencies : "predecessor 1:N"
+tasks ||--o{ task_dependencies : "successor 1:N"
+organizations ||--o{ resources : "1:N"
+tasks ||--o{ task_resources : "1:N"
+resources ||--o{ task_resources : "1:N"
+projects ||--o{ buffers : "1:N"
+projects ||--o{ critical_chains : "1:N"
+projects ||--o{ progress_reports : "1:N"
+tasks ||--o{ progress_reports : "1:N"
+users ||--o{ progress_reports : "reporter 1:N"
+
+@enduml

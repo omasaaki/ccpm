@@ -1,0 +1,81 @@
+@startsalt
+{
+  {* CCPM - Project Detail (Web) | 🔔 3 | 👤 田中太郎 ▼ | 🌐 JP ▼ }
+  ==
+  {T
+    + 📊 Dashboard
+    + 📁 Projects
+    ++ List
+    ++ <b>Detail</b>
+    + 📋 Tasks
+    + 📈 Analytics
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      {/ <b>Project Alpha</b> | Status: <color:green>Active</color> | [ Edit ] | [ Export ] }
+      ==
+      {T
+        <b>Project Information</b>
+        --
+        Project Name: Project Alpha
+        Description: CCPMシステム開発プロジェクト
+        Start Date: 2025-01-01
+        End Date: 2025-06-30
+        Owner: 田中太郎
+        Organization: IT Department
+        |
+        <b>Progress Overview</b>
+        --
+        Overall Progress: ████████░░ 80%
+        Tasks Completed: 15 / 25 (60%)
+        Buffer Consumption: <color:orange>70%</color>
+        Critical Chain Status: <color:orange>⚠️ Warning</color>
+        --
+        <b>Key Metrics</b>
+        Budget Used: ¥2,500,000 / ¥5,000,000
+        Resources: 5 members active
+        Days Remaining: 45 days
+      }
+      ==
+      {T+
+        <b>📊 Quick Stats</b>
+        {
+          Tasks by Status
+          TODO: 8
+          IN_PROGRESS: 5
+          REVIEW: 2
+          DONE: 10
+        }
+        |
+        <b>📈 Buffer Trend</b>
+        {
+          Week 1: 10%
+          Week 2: 25%
+          Week 3: 40%
+          Week 4: 70% <color:orange>⚠️</color>
+        }
+        |
+        <b>👥 Team Members</b>
+        {
+          田中太郎 (PM)
+          佐藤花子 (Dev)
+          鈴木次郎 (Dev)
+          山田太郎 (Design)
+          高橋花子 (QA)
+        }
+      }
+      ==
+      {T
+        <b>Recent Activities</b>
+        • 2025-01-22 10:30 - Task #103 updated by 鈴木次郎
+        • 2025-01-22 09:15 - Task #105 moved to REVIEW by 高橋花子
+        • 2025-01-21 16:45 - New member added: 山田太郎
+        • 2025-01-21 14:20 - Milestone "Phase 1" completed
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System | Last updated: 2025-01-22 10:30 }
+}
+@endsalt

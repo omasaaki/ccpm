@@ -1,0 +1,91 @@
+@startuml security_threat_model
+title CCPMシステム脅威モデル
+
+!define THREAT_COLOR #FF6B6B
+!define ASSET_COLOR #4ECDC4
+!define CONTROL_COLOR #45B7D1
+!define BOUNDARY_COLOR #96CEB4
+
+' アクター定義
+actor "悪意のある外部攻撃者" as Attacker THREAT_COLOR
+actor "内部ユーザー" as InternalUser
+actor "システム管理者" as Admin
+actor "一般ユーザー" as User #90EE90
+
+' システム境界
+rectangle "インターネット" as Internet BOUNDARY_COLOR {
+  rectangle "DDoS攻撃" as DDoS THREAT_COLOR
+  rectangle "フィッシング攻撃" as Phishing THREAT_COLOR
+}
+
+rectangle "DMZ" as DMZ BOUNDARY_COLOR {
+  rectangle "ロードバランサー" as LoadBalancer CONTROL_COLOR
+  rectangle "WAF (Web Application Firewall)" as WAF CONTROL_COLOR
+  rectangle "リバースプロキシ" as ReverseProxy CONTROL_COLOR
+}
+
+rectangle "アプリケーション層" as AppTier BOUNDARY_COLOR {
+  rectangle "Webサーバー" as WebServer {
+    rectangle "認証機能" as Auth ASSET_COLOR
+    rectangle "認可機能" as Authorization ASSET_COLOR
+    rectangle "セッション管理" as Session ASSET_COLOR
+  }
+  
+  rectangle "APIサーバー" as APIServer {
+    rectangle "ビジネスロジック" as BusinessLogic ASSET_COLOR
+    rectangle "入力検証" as InputValidation CONTROL_COLOR
+    rectangle "出力エンコーディング" as OutputEncoding CONTROL_COLOR
+  }
+}
+
+rectangle "データ層" as DataTier BOUNDARY_COLOR {
+  database "PostgreSQL" as Database ASSET_COLOR {
+    rectangle "ユーザーデータ" as UserData ASSET_COLOR
+    rectangle "プロジェクトデータ" as ProjectData ASSET_COLOR
+    rectangle "機密情報" as ConfidentialData ASSET_COLOR
+  }
+  
+  rectangle "Redis" as Redis ASSET_COLOR {
+    rectangle "セッションストア" as SessionStore ASSET_COLOR
+    rectangle "キャッシュ" as Cache ASSET_COLOR
+  }
+}
+
+' 脅威フロー
+Attacker --> Internet : "1. DDoS攻撃"
+Attacker --> Internet : "2. SQLインジェクション試行"
+Attacker --> Internet : "3. XSS攻撃"
+Attacker --> Internet : "4. CSRF攻撃"
+Attacker --> Internet : "5. 認証バイパス試行"
+
+Internet --> WAF : "攻撃トラフィック"
+WAF --> LoadBalancer : "フィルタ済みトラフィック"
+LoadBalancer --> ReverseProxy
+ReverseProxy --> WebServer
+
+InternalUser --> Auth : "6. 権限昇格試行"
+InternalUser --> ProjectData : "7. 不正データアクセス"
+
+' セキュリティ統制
+WAF -[CONTROL_COLOR]-> Internet : "攻撃遮断"
+Auth -[CONTROL_COLOR]-> Session : "多要素認証"
+Authorization -[CONTROL_COLOR]-> BusinessLogic : "RBAC制御"
+InputValidation -[CONTROL_COLOR]-> Database : "SQLインジェクション防止"
+OutputEncoding -[CONTROL_COLOR]-> User : "XSS防止"
+
+' 脅威の説明
+note right of Attacker : 脅威アクター
+note right of DDoS : T1: サービス拒否攻撃
+note right of Auth : C1: JWT + MFA
+note right of Database : A1: 機密データ
+
+' 脅威レベル
+legend right
+  |色|レベル|説明|
+  |<back:THREAT_COLOR>   </back>|Critical|即座の対応が必要|
+  |<back:ASSET_COLOR>   </back>|High|保護すべき資産|
+  |<back:CONTROL_COLOR>   </back>|Medium|セキュリティ統制|
+  |<back:BOUNDARY_COLOR>   </back>|Low|システム境界|
+endlegend
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml Data Flow Architecture
+title CCPM システム - データフロー図
+
+actor User
+participant "React Component" as RC
+participant "Redux Store" as Store
+participant "API Client" as API
+participant "Express Router" as Router
+participant "Auth Middleware" as Auth
+participant "Service Layer" as Service
+participant "Repository" as Repo
+participant "PostgreSQL" as DB
+participant "CCPM Calculator" as Calculator
+
+== Authentication Flow ==
+User -> RC : login
+RC -> API : POST /auth/login
+API -> Router : HTTP request
+Router -> Auth : validate
+Auth -> Service : authenticate
+Service -> Repo : find user
+Repo -> DB : SELECT user
+DB --> Repo : user data
+Repo --> Service : user entity
+Service --> Auth : JWT token
+Auth --> Router : response
+Router --> API : HTTP response
+API -> Store : update auth
+Store --> RC : success
+RC --> User : dashboard
+
+== Project Creation Flow ==
+User -> RC : create project
+RC -> Store : dispatch
+Store -> API : POST /projects
+API -> Router : HTTP request
+Router -> Auth : verify JWT
+Auth -> Service : create project
+Service -> Repo : save project
+Repo -> DB : INSERT project
+DB --> Repo : project ID
+Repo --> Service : saved project
+Service --> Router : project data
+Router --> API : response
+API -> Store : update projects
+Store --> RC : created
+RC --> User : success
+
+== CCPM Calculation Flow ==
+User -> RC : calculate
+RC -> API : POST /calculate
+API -> Router : request
+Router -> Auth : verify
+Auth -> Service : calculate
+Service -> Repo : get tasks
+Repo -> DB : SELECT tasks
+DB --> Repo : task data
+Repo --> Service : entities
+Service -> Calculator : calculate
+Calculator --> Service : result
+Service -> Repo : save result
+Repo -> DB : UPDATE
+Service --> Router : complete
+Router --> API : response
+API -> Store : update
+Store --> RC : results
+RC --> User : display
+
+@enduml

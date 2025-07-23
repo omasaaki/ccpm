@@ -1,0 +1,103 @@
+@startuml CCPM Calculation Sequence
+title CCPM クリティカルチェーン計算 シーケンス図
+
+actor User
+participant Controller as "CCPM Controller"
+participant Service as "CCPM Service"
+participant Calculator as "CCPM Calculator"
+participant TaskRepo as "Task Repository"
+participant BufferRepo as "Buffer Repository"
+participant ProjectRepo as "Project Repository"
+database Database
+participant WebSocket as "WebSocket Service"
+
+== クリティカルチェーン計算リクエスト ==
+User -> Controller: POST /api/v1/projects/{id}/critical-chain/calculate
+activate Controller
+
+Controller -> Service: calculateCriticalChain(projectId)
+activate Service
+
+== データ取得フェーズ ==
+Service -> TaskRepo: getProjectTasks(projectId)
+activate TaskRepo
+TaskRepo -> Database: SELECT tasks with dependencies
+Database --> TaskRepo: task data
+TaskRepo --> Service: Task[]
+deactivate TaskRepo
+
+Service -> ProjectRepo: getProject(projectId)
+activate ProjectRepo
+ProjectRepo -> Database: SELECT project
+Database --> ProjectRepo: project data
+ProjectRepo --> Service: Project
+deactivate ProjectRepo
+
+== 計算フェーズ ==
+Service -> Calculator: calculateCriticalChain(tasks)
+activate Calculator
+
+Calculator -> Calculator: validateTaskData()
+Calculator -> Calculator: topologicalSort(tasks)
+Calculator -> Calculator: calculateForwardPass()
+Calculator -> Calculator: calculateBackwardPass()
+Calculator -> Calculator: findCriticalPath()
+Calculator -> Calculator: applyResourceConstraints()
+
+Calculator --> Service: CriticalChain
+deactivate Calculator
+
+== バッファ計算フェーズ ==
+Service -> Calculator: calculateBuffers(criticalChain)
+activate Calculator
+
+Calculator -> Calculator: calculateProjectBuffer()
+Calculator -> Calculator: calculateFeedingBuffers()
+
+Calculator --> Service: Buffer[]
+deactivate Calculator
+
+== データ保存フェーズ ==
+Service -> ProjectRepo: saveCriticalChain(criticalChain)
+activate ProjectRepo
+ProjectRepo -> Database: INSERT/UPDATE critical_chain
+Database --> ProjectRepo: success
+ProjectRepo --> Service: saved
+deactivate ProjectRepo
+
+Service -> BufferRepo: saveBuffers(buffers)
+activate BufferRepo
+BufferRepo -> Database: INSERT/UPDATE buffers
+Database --> BufferRepo: success
+BufferRepo --> Service: saved
+deactivate BufferRepo
+
+== 通知フェーズ ==
+Service -> WebSocket: notifyProjectSubscribers(projectId, result)
+activate WebSocket
+WebSocket -> User: calculation_complete event
+deactivate WebSocket
+
+Service --> Controller: CriticalChainResult
+deactivate Service
+
+Controller --> User: 200 OK + calculation result
+deactivate Controller
+
+== エラーケース ==
+alt 計算エラー発生時
+    Calculator -> Calculator: error occurs
+    Calculator --> Service: throw CCPMCalculationError
+    Service --> Controller: error response
+    Controller --> User: 422 Unprocessable Entity
+end
+
+alt データ不整合エラー
+    TaskRepo -> Database: SELECT tasks
+    Database --> TaskRepo: inconsistent data
+    TaskRepo --> Service: throw DataConsistencyError
+    Service --> Controller: error response
+    Controller --> User: 500 Internal Server Error
+end
+
+@enduml

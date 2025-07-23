@@ -1,0 +1,46 @@
+@startsalt
+{
+  {* Project Alpha - Fever Chart }
+  ==
+  {T
+    + 📊 Dashboard  
+    + 📁 Projects
+    + 📋 Tasks
+    + 📈 Analytics
+    ++ Critical Chain
+    ++ Buffer Analysis
+    ++ <b>Fever Chart</b>
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      {/ <b>Buffer Consumption vs Progress Rate</b> }
+      --
+      {T
+        Buffer % | Chart Area                                    
+        100% | <color:red>🔥 RED ZONE</color>                           
+        80%  | ────────────────────────────────────────────
+        60%  | <color:orange>⚠️ YELLOW ZONE</color>  ● <-- Current Position     
+        40%  | ────────────────────────────────────────────
+        20%  | <color:green>✅ GREEN ZONE</color>                        
+        0%   | ────────────────────────────────────────────
+             | 0%    20%    40%    60%    80%    100%
+             |              Progress Rate
+      }
+      --
+      {/ <b>Current Status Analysis</b> }
+      {
+        Status: <color:orange>⚠️ Attention Required</color>
+        Buffer Consumption: <b>75%</b> | Progress Rate: <b>65%</b>
+        --
+        <b>Recommended Actions:</b>
+        • Consider adding resources
+        • Review critical path tasks
+        • Implement risk mitigation
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System }
+}
+@endsalt

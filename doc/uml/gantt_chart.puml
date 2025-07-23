@@ -1,0 +1,41 @@
+@startsalt
+{
+  {* Project Alpha - Gantt Chart | 📊 View | 🔄 Refresh | ⚙️ Settings }
+  ==
+  {T
+    + 📊 Dashboard
+    + 📁 Projects
+    ++ List
+    ++ <b>Gantt</b>
+    ++ Kanban
+    + 📋 Tasks
+    + 📈 Analytics
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      {* 2025年1月 | 2025年2月 }
+      {T
+        Task | 15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31| 1| 2| 3| 4| 5
+        Task A | ████████                                              |  |  |  |  | 
+        Task B |     ████████████                                      |  |  |  |  |
+        Task C |         ████████████                                  |  |  |  |  |
+        Task D |               ████████                                |  |  |  |  |
+        <color:red>═══ Critical Chain ═══</color> |                                                      |  |  |  |  |
+        <color:blue>Buffer1</color> |        ░░░                                            |  |  |  |  |
+        Task E |          ████████████████                            |  |  |  |  |
+        Task F |                ████████████                          |  |  |  |  |
+        <color:blue>Buffer2</color> |                     ░░░                               |  |  |  |  |
+      }
+      --
+      {
+        📊 <b>Legend:</b>
+        ████ Completed | ████ In Progress | ░░░░ Planned
+        <color:red>═══</color> Critical Chain | <color:blue>░░░</color> Buffer
+      }
+    }
+  }
+  ==
+  {* © 2025 CCMP System }
+}
+@endsalt

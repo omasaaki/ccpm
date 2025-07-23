@@ -1,0 +1,109 @@
+@startsalt
+{
+  {* CCPM - Task Board (Web) | [ + New Task ] | 🔔 3 | 👤 田中太郎 ▼ | 🌐 JP ▼ }
+  ==
+  {T
+    + 📊 Dashboard
+    + 📁 Projects  
+    + 📋 Tasks
+    ++ List
+    ++ <b>Board</b>
+    ++ Calendar
+    + 📈 Analytics
+    + 📊 Reports
+    + ⚙️ Admin
+    |
+    {
+      {/ <b>Project Alpha - Task Board</b> }
+      "🔍 Search tasks..." | ^Filter: All^ | ^Sort: Priority^ | ^Group: Status^
+      ==
+      {T+
+        <b>📋 TODO</b>
+        {
+          Task #101
+          画面設計レビュー
+          Priority: High
+          田中太郎
+          Due: 2025-01-25
+          --
+          [ View ] [ Edit ]
+        }
+        --
+        {
+          Task #102
+          API仕様書作成
+          Priority: Medium
+          佐藤花子
+          Due: 2025-01-28
+          --
+          [ View ] [ Edit ]
+        }
+        --
+        [ + Add Task ]
+        |
+        <b>🚧 IN PROGRESS</b>
+        {
+          Task #103
+          データベース設計
+          Priority: High
+          鈴木次郎
+          Due: 2025-01-24
+          Progress: 60%
+          --
+          [ View ] [ Edit ]
+        }
+        --
+        {
+          Task #104
+          認証機能実装
+          Priority: High
+          山田太郎
+          Due: 2025-01-26
+          Progress: 30%
+          --
+          [ View ] [ Edit ]
+        }
+        --
+        [ + Add Task ]
+        |
+        <b>👀 REVIEW</b>
+        {
+          Task #105
+          要件定義書
+          Priority: High
+          高橋花子
+          Due: 2025-01-23
+          Reviewer: PM
+          --
+          [ View ] [ Edit ]
+        }
+        --
+        [ + Add Task ]
+        |
+        <b>✅ DONE</b>
+        {
+          Task #106
+          プロジェクト計画
+          Priority: High
+          田中太郎
+          Completed: 2025-01-22
+          --
+          [ View ] [ Archive ]
+        }
+        --
+        {
+          Task #107
+          環境構築
+          Priority: Medium
+          佐藤花子
+          Completed: 2025-01-21
+          --
+          [ View ] [ Archive ]
+        }
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System | Tasks: 7 | Completed: 2 (29%) }
+}
+@endsalt

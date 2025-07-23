@@ -1,0 +1,39 @@
+@startsalt
+{
+  {* CCPM - User Management (Web) | [ + New User ] | 🔔 3 | 👤 Admin ▼ | 🌐 JP ▼ }
+  ==
+  {T
+    + 📊 Dashboard
+    + 📁 Projects
+    + 📋 Tasks
+    + 📈 Analytics
+    + 📊 Reports
+    + ⚙️ Admin
+    ++ <b>Users</b>
+    ++ Organizations
+    ++ Resources
+    ++ Settings
+    |
+    {
+      {/ <b>User Management</b> }
+      "🔍 Search users..." | ^Role: All^ | ^Status: All^ | [ Import CSV ] | [ Export ]
+      ==
+      {T
+        [X] | User ID | Name | Email | Role | Organization | Status | Last Login | Actions
+        [ ] | U001 | 田中太郎 | tanaka@example.com | Admin | IT Dept | <color:green>Active</color> | 2025-01-22 10:30 | [ Edit ] [ Disable ]
+        [ ] | U002 | 佐藤花子 | sato@example.com | Manager | IT Dept | <color:green>Active</color> | 2025-01-22 09:15 | [ Edit ] [ Disable ]
+        [ ] | U003 | 鈴木次郎 | suzuki@example.com | User | Dev Team | <color:green>Active</color> | 2025-01-21 16:45 | [ Edit ] [ Disable ]
+        [ ] | U004 | 山田太郎 | yamada@example.com | User | Dev Team | <color:green>Active</color> | 2025-01-21 14:20 | [ Edit ] [ Disable ]
+        [ ] | U005 | 高橋花子 | takahashi@example.com | User | QA Team | <color:green>Active</color> | 2025-01-22 08:00 | [ Edit ] [ Disable ]
+        [ ] | U006 | 伊藤一郎 | ito@example.com | User | Dev Team | <color:gray>Inactive</color> | 2025-01-10 15:30 | [ Edit ] [ Enable ]
+      }
+      ==
+      {
+        [ Bulk Edit ] | [ Delete Selected ] | Showing 1-6 of 6 users | < Previous | Page 1 | Next >
+      }
+    }
+  }
+  ==
+  {* © 2025 CCPM System | Total Users: 6 | Active: 5 | Inactive: 1 }
+}
+@endsalt
