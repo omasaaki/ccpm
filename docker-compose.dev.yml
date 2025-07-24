@@ -1,0 +1,57 @@
+# Development environment configuration
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  postgres:
+    environment:
+      POSTGRES_DB: ccpm_dev
+      POSTGRES_USER: ccpm_dev_user
+      POSTGRES_PASSWORD: ccpm_dev_password
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts
+
+  redis:
+    command: redis-server --appendonly yes  # No password for development
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+
+  backend:
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://ccpm_dev_user:ccpm_dev_password@postgres:5432/ccpm_dev
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev-jwt-secret-key
+      JWT_REFRESH_SECRET: dev-refresh-secret-key
+      ENCRYPTION_KEY: dev-encryption-key-32-bytes-long
+      LOG_LEVEL: debug
+      ENABLE_SWAGGER: true
+      ENABLE_CORS: true
+    volumes:
+      - ./backend:/app
+      - backend_dev_node_modules:/app/node_modules
+    command: npm run dev
+
+  frontend:
+    environment:
+      VITE_API_URL: http://localhost:3001
+      VITE_APP_ENV: development
+      VITE_ENABLE_DEVTOOLS: true
+    volumes:
+      - ./frontend:/app
+      - frontend_dev_node_modules:/app/node_modules
+    command: npm run dev
+
+  # Development tools
+  adminer:
+    profiles:
+      - dev-tools
+
+  redis-commander:
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    profiles:
+      - dev-tools
+
+volumes:
+  backend_dev_node_modules:
+  frontend_dev_node_modules:
