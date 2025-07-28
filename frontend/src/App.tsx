@@ -1,135 +1,135 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Button, Alert } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { AuthProvider, useAuth } from './store/AuthContext';
+import { AppProvider, useApp } from './store/AppContext';
+import MainLayout from './components/Layout/MainLayout';
+import LoadingSpinner from './components/ui/LoadingSpinner';
+import NotificationSnackbar from './components/ui/NotificationSnackbar';
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Projects from './pages/Projects/Projects';
+import Tasks from './pages/Tasks/Tasks';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
+// Protected Route component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingSpinner fullScreen />;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
-interface ApiStatus {
-  message: string;
-  version: string;
-  timestamp: string;
-}
-
-function App() {
-  const [apiStatus, setApiStatus] = useState<ApiStatus | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const checkApiStatus = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch('http://localhost:3001/api/v1/status');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setApiStatus(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to connect to API');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkApiStatus();
-  }, []);
-
+// App content with theme
+const AppContent: React.FC = () => {
+  const { isDarkMode } = useApp();
+  
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: isDarkMode ? 'dark' : 'light',
+          primary: {
+            main: '#1976d2',
+          },
+          secondary: {
+            main: '#dc004e',
+          },
+        },
+        typography: {
+          fontFamily: [
+            '-apple-system',
+            'BlinkMacSystemFont',
+            '"Segoe UI"',
+            'Roboto',
+            '"Helvetica Neue"',
+            'Arial',
+            'sans-serif',
+            '"Apple Color Emoji"',
+            '"Segoe UI Emoji"',
+            '"Segoe UI Symbol"',
+          ].join(','),
+        },
+      }),
+    [isDarkMode]
+  );
+  
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md">
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h2" component="h1" gutterBottom align="center">
-            🎯 CCPM
-          </Typography>
-          <Typography variant="h5" component="h2" gutterBottom align="center" color="text.secondary">
-            Critical Chain Project Management
-          </Typography>
-
-          <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-            <Typography variant="h4" gutterBottom>
-              開発環境構築完了！
-            </Typography>
-            
-            <Typography variant="body1" paragraph>
-              CCPM（Critical Chain Project Management）システムの開発環境が正常に起動しています。
-            </Typography>
-
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                🔗 アクセス可能なエンドポイント:
-              </Typography>
-              <ul>
-                <li><strong>Frontend</strong>: http://localhost:3000</li>
-                <li><strong>Backend API</strong>: http://localhost:3001</li>
-                <li><strong>Health Check</strong>: http://localhost:3001/health</li>
-                <li><strong>Adminer (DB)</strong>: http://localhost:8080</li>
-                <li><strong>Redis Commander</strong>: http://localhost:8081</li>
-              </ul>
-            </Box>
-
-            <Box sx={{ mt: 3 }}>
-              <Button 
-                variant="contained" 
-                onClick={checkApiStatus}
-                disabled={loading}
-                sx={{ mr: 2 }}
-              >
-                {loading ? 'チェック中...' : 'API接続テスト'}
-              </Button>
-            </Box>
-
-            {apiStatus && (
-              <Alert severity="success" sx={{ mt: 2 }}>
-                <Typography variant="subtitle2">API接続成功!</Typography>
-                <Typography variant="body2">
-                  {apiStatus.message} (v{apiStatus.version})
-                </Typography>
-                <Typography variant="caption">
-                  最終確認: {new Date(apiStatus.timestamp).toLocaleString()}
-                </Typography>
-              </Alert>
-            )}
-
-            {error && (
-              <Alert severity="error" sx={{ mt: 2 }}>
-                <Typography variant="subtitle2">API接続エラー</Typography>
-                <Typography variant="body2">{error}</Typography>
-                <Typography variant="caption">
-                  バックエンドサーバーが起動していることを確認してください
-                </Typography>
-              </Alert>
-            )}
-          </Paper>
-
-          <Paper elevation={1} sx={{ p: 3, mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              📋 次のステップ:
-            </Typography>
-            <ol>
-              <li>データベースセットアップ (Prisma)</li>
-              <li>基本フレームワーク実装</li>
-              <li>認証・認可基盤実装</li>
-              <li>コア機能開発</li>
-            </ol>
-          </Paper>
-        </Box>
-      </Container>
+      <Router>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          {/* Protected routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Navigate to="/dashboard" replace />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Dashboard />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Projects />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Tasks />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Catch all - redirect to dashboard */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Router>
+      <NotificationSnackbar />
     </ThemeProvider>
   );
-}
+};
+
+// Main App component
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </AuthProvider>
+  );
+};
 
 export default App;
