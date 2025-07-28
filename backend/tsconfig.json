@@ -29,18 +29,6 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"],
-      "@/types/*": ["src/types/*"],
-      "@/controllers/*": ["src/controllers/*"],
-      "@/services/*": ["src/services/*"],
-      "@/models/*": ["src/models/*"],
-      "@/middleware/*": ["src/middleware/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/config/*": ["src/config/*"],
-      "@/routes/*": ["src/routes/*"],
-      "@/validators/*": ["src/validators/*"]
-    },
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": [
@@ -56,7 +44,6 @@
     "**/*.spec.ts"
   ],
   "ts-node": {
-    "require": ["tsconfig-paths/register"],
     "files": true,
     "experimentalSpecifierResolution": "node"
   }

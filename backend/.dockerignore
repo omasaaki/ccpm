@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build outputs
+dist
+build
+coverage
+
+# Development files
+*.log
+*.tmp
+.env*
+!.env.example
+
+# Source control
+.git
+.gitignore
+.github
+
+# Testing
+coverage
+*.test.ts
+*.spec.ts
+tests
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+docs
+
+# Prisma
+prisma/migrations
+!prisma/schema.prisma
+!prisma/seed.ts

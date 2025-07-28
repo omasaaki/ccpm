@@ -1,14 +1,18 @@
-# Frontend Dockerfile for CCPM
+# Multi-stage build for CCPM Frontend
 FROM node:18-alpine AS base
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Install security updates
+RUN apk upgrade
+
+# Copy package files first for better layer caching
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps && \
+    npm cache clean --force
 
 # Development stage
 FROM base AS development
@@ -19,31 +23,52 @@ CMD ["npm", "run", "dev"]
 # Build stage
 FROM base AS builder
 COPY . .
+
+# Build production assets
 RUN npm run build
 
-# Production stage with Nginx
-FROM nginx:alpine AS production
+# Production stage with optimized Nginx
+FROM nginx:1.25-alpine AS production
 
-# Create nginx user
-RUN addgroup -g 1001 -S nginx-group
-RUN adduser -S frontend -u 1001 -G nginx-group
+# Install security updates and curl for health checks
+RUN apk upgrade && \
+    apk add --no-cache curl
 
-# Copy custom nginx configuration
+# Create non-root user for security
+RUN addgroup -g 1001 -S nginx-group && \
+    adduser -S frontend -u 1001 -G nginx-group
+
+# Copy optimized nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy built application
+# Copy built application with proper ownership
 COPY --from=builder --chown=frontend:nginx-group /app/dist /usr/share/nginx/html
 
-# Copy nginx template for environment variables
+# Copy nginx template for runtime configuration
 COPY nginx.template /etc/nginx/templates/default.conf.template
+
+# Create health check script
+RUN echo '#!/bin/sh\ncurl -f http://localhost:80/ || exit 1' > /usr/local/bin/health-check.sh && \
+    chmod +x /usr/local/bin/health-check.sh && \
+    chown frontend:nginx-group /usr/local/bin/health-check.sh
+
+# Create required directories with proper permissions
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run && \
+    chown -R frontend:nginx-group /var/cache/nginx /var/log/nginx /var/run && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx /var/run
 
 # Switch to non-root user
 USER frontend
 
+# Expose port
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost/ || exit 1
+# Enhanced health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD /usr/local/bin/health-check.sh
 
+# Set production environment
+ENV NODE_ENV=production
+
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]

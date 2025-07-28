@@ -10,16 +10,25 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "ci:test": "jest --ci --coverage --watchAll=false --maxWorkers=2",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
+    "ci:lint": "eslint src --ext .ts --max-warnings 0",
     "typecheck": "tsc --noEmit",
+    "ci:typecheck": "tsc --noEmit",
+    "ci:audit": "npm audit --audit-level=high --production",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
     "docker:build": "docker build -t ccpm-backend .",
-    "docker:run": "docker run -p 3001:3001 ccmp-backend"
+    "docker:build:prod": "docker build -t ccpm-backend:latest .",
+    "docker:run": "docker run -p 3001:3001 ccmp-backend",
+    "docker:push": "docker push ccpm-backend:latest",
+    "format:check": "prettier --check \"src/**/*.{ts,js}\"",
+    "format:write": "prettier --write \"src/**/*.{ts,js}\"",
+    "ci:all": "npm run ci:typecheck && npm run ci:lint && npm run ci:test && npm run ci:audit"
   },
   "keywords": [
     "ccpm",
@@ -86,7 +95,8 @@
     "prettier": "^3.1.1",
     "prisma": "^5.7.1",
     "husky": "^8.0.3",
-    "lint-staged": "^15.2.0"
+    "lint-staged": "^15.2.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -115,5 +125,9 @@
     ],
     "coverageDirectory": "coverage",
     "coverageReporters": ["text", "lcov", "html"]
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts",
+    "schema": "prisma/schema.prisma"
   }
 }

@@ -40,21 +40,26 @@ cp .env.development .env
 ```bash
 # セットアップスクリプトを実行
 ./scripts/setup-dev.sh
+
+# セットアップ完了後、コンテナを起動
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
-このスクリプトは以下を実行します：
+セットアップスクリプトは以下を実行します：
 - Docker/Docker Composeの確認
 - 環境変数ファイルの作成
 - 開発環境の構築手順表示
+
+**注意**: スクリプト実行後、手動でコンテナを起動する必要があります。
 
 #### 手動セットアップ
 
 ```bash
 # 開発環境用Docker Composeで起動
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 # ログを確認
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f
+docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f
 ```
 
 ### 4. 依存関係のインストール（ローカル開発時）
@@ -77,14 +82,19 @@ npm install
 
 ```bash
 # Backendコンテナに入る
-docker-compose exec backend bash
+docker compose exec backend sh
 
-# Prismaマイグレーションを実行
-npx prisma migrate dev
+# Prisma Client生成
+npx prisma generate
 
-# 初期データを投入（今後実装予定）
+# Prismaマイグレーションを実行（初回）
+npx prisma migrate dev --name init
+
+# 初期データを投入
 npm run prisma:seed
 ```
+
+**注意**: 初回起動時、BackendとFrontendが正常に起動しない場合は、基本的なアプリケーションファイルが作成されるまで待機してください。開発環境が完全に初期化されると自動的に動作します。
 
 ### 6. アクセス確認
 
@@ -95,6 +105,7 @@ npm run prisma:seed
 - **API Status**: http://localhost:3001/api/v1/status
 - **Health Check**: http://localhost:3001/health
 - **Adminer** (DB管理): http://localhost:8080
+  - システム: `PostgreSQL`
   - サーバー: `postgres`
   - ユーザー名: `ccpm_dev_user`
   - パスワード: `ccpm_dev_password`
@@ -171,10 +182,10 @@ REDIS_PORT=6380
 
 キャッシュをクリアして再ビルド：
 ```bash
-docker-compose down
+docker compose down
 docker system prune -a
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml build --no-cache
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.dev.yml build --no-cache
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 ### 権限エラー（Linux/WSL）
@@ -187,48 +198,48 @@ sudo chown -R $USER:$USER .
 
 PostgreSQLコンテナが正常に起動しているか確認：
 ```bash
-docker-compose ps
-docker-compose logs postgres
+docker compose ps
+docker compose logs postgres
 ```
 
 ### node_modules関連のエラー
 
 ```bash
 # コンテナ内のnode_modulesを削除
-docker-compose down
+docker compose down
 docker volume rm ccpm_backend_node_modules ccpm_frontend_node_modules
 
 # 再起動
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
 ## Docker Composeコマンド一覧
 
 ```bash
 # 起動
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 # 停止
-docker-compose down
+docker compose down
 
 # 再起動
-docker-compose restart
+docker compose restart
 
 # ログ確認
-docker-compose logs -f [service_name]
+docker compose logs -f [service_name]
 
 # コンテナに入る
-docker-compose exec backend bash
-docker-compose exec frontend sh
+docker compose exec backend sh
+docker compose exec frontend sh
 
 # ボリューム含めて削除
-docker-compose down -v
+docker compose down -v
 
 # 特定サービスのみ起動
-docker-compose up -d postgres redis
+docker compose up -d postgres redis
 
 # ビルドして起動
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ## 開発ツール
@@ -352,7 +363,7 @@ sudo chmod 666 /var/run/docker.sock
 ```
 システム: PostgreSQL
 サーバー: postgres
-ユーザー名: ccmp_dev_user  
+ユーザー名: ccpm_dev_user
 パスワード: ccpm_dev_password
 データベース: ccpm_dev
 ```
@@ -396,7 +407,34 @@ docker system prune -a
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ```
 
-## 開発環境構築作業ログ (2025-01-22)
+#### Q11: ts-node実行エラー
+**エラー**: `Cannot find module 'tsconfig-paths/register'`
+
+**解決方法**: TypeScript設定を簡素化済み。問題が発生する場合：
+```bash
+# コンテナ再ビルド
+docker compose build --no-cache backend
+docker compose restart backend
+```
+
+**原因**: 複雑なTypeScript設定との競合。基本設定で安定動作を優先。
+
+#### Q12: Backend/Frontend初回起動失敗
+**症状**: `Cannot find module '/app/src/index.ts'` または `Cannot find module '/app/dist/index.js'`
+
+**解決方法**: 基本アプリケーションファイルが自動作成されるまで待機：
+```bash
+# ログで確認
+docker compose logs -f backend
+docker compose logs -f frontend
+
+# 必要に応じてコンテナ再起動
+docker compose restart backend frontend
+```
+
+**原因**: 初回セットアップ時、基本的なソースファイルが段階的に生成されるため。
+
+## 開発環境構築作業ログ (2025-01-22, 2025-01-24)
 
 ### 解決した主な問題
 1. ✅ package-lock.json未存在エラー → `npm install`使用に変更
@@ -404,14 +442,27 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 3. ✅ PostgreSQLポート競合 → デフォルトポート5433に変更
 4. ✅ Docker権限問題 → `newgrp docker`で解決
 5. ✅ WSL2アクセス問題 → `localhost`使用で解決
+6. ✅ Prisma OpenSSLエラー → Alpine Linux用OpenSSL設定追加
+7. ✅ ts-node設定エラー → TypeScript設定簡素化
+8. ✅ 基本アプリケーションファイル不足 → Express.js・React基本構成作成
 
 ### 最終構成
-| サービス | ポート | アクセスURL |
-|---------|--------|-------------|
-| PostgreSQL | 5433 | localhost:5433 |
-| Redis | 6380 | localhost:6380 |
-| Adminer | 8080 | http://localhost:8080 |
-| Redis Commander | 8081 | http://localhost:8081 |
+| サービス | ポート | アクセスURL | 状態 |
+|---------|--------|-------------|------|
+| Frontend (React) | 3000 | http://localhost:3000 | ✅ 動作確認済み |
+| Backend (Express) | 3001 | http://localhost:3001 | ✅ 動作確認済み |
+| PostgreSQL | 5433 | localhost:5433 | ✅ 正常動作 |
+| Redis | 6380 | localhost:6380 | ✅ 正常動作 |
+| Adminer | 8080 | http://localhost:8080 | ✅ 正常動作 |
+| Redis Commander | 8081 | http://localhost:8081 | ✅ 正常動作 |
+
+### 作成されたファイル
+- `backend/src/index.ts` - Express.js基本サーバー
+- `frontend/src/App.tsx` - React + Material-UI基本アプリ  
+- `frontend/src/main.tsx` - Reactエントリーポイント
+- `frontend/index.html` - HTML テンプレート
+- `backend/prisma/schema.prisma` - データベーススキーマ
+- `backend/prisma/seed.ts` - サンプルデータ
 
 ---
 
@@ -421,3 +472,4 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 |------|------|----------|--------|
 | 2025-01-22 | 1.0 | 初版作成 | - |
 | 2025-01-22 | 1.1 | FAQ・トラブルシューティング追加、作業ログ追加 | - |
+| 2025-01-24 | 1.2 | Prisma・ts-node関連問題解決、基本アプリ作成完了を反映 | - |

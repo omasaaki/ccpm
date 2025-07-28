@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build outputs (keep dist for production build)
+coverage
+
+# Development files
+*.log
+*.tmp
+.env*
+!.env.example
+
+# Source control
+.git
+.gitignore
+.github
+
+# Testing
+coverage
+src/**/*.test.ts
+src/**/*.test.tsx
+src/**/*.spec.ts
+src/**/*.spec.tsx
+tests
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+docs
+
+# Storybook
+.storybook
+storybook-static
+
+# Vite
+.vite
