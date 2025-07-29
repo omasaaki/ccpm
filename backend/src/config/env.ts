@@ -23,6 +23,25 @@ export const config = {
     version: 'v1',
     prefix: '/api/v1',
   },
+  email: {
+    smtp: {
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      user: process.env.SMTP_USER || '',
+      pass: process.env.SMTP_PASS || '',
+    },
+    from: process.env.EMAIL_FROM || 'noreply@ccpm.com',
+  },
+  app: {
+    url: process.env.APP_URL || 'http://localhost:3000',
+  },
+  auth: {
+    lockoutThreshold: parseInt(process.env.AUTH_LOCKOUT_THRESHOLD || '5'),
+    lockoutDuration: parseInt(process.env.AUTH_LOCKOUT_DURATION || '900000'), // 15 minutes in ms
+    passwordResetExpiration: parseInt(process.env.PASSWORD_RESET_EXPIRATION || '3600000'), // 1 hour in ms
+    emailVerificationExpiration: parseInt(process.env.EMAIL_VERIFICATION_EXPIRATION || '86400000'), // 24 hours in ms
+  },
 } as const;
 
 // Validate required environment variables

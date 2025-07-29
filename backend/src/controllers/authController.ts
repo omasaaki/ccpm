@@ -4,6 +4,17 @@ import { ApiResponse } from '../types/api';
 import { LoginRequest, RegisterRequest } from '../types/auth';
 
 export class AuthController {
+  // Get client IP address
+  private static getClientIp(req: Request): string {
+    const forwarded = req.headers['x-forwarded-for'] as string;
+    const ip = forwarded ? forwarded.split(',')[0].trim() : req.socket?.remoteAddress;
+    return ip || 'unknown';
+  }
+
+  // Get user agent
+  private static getUserAgent(req: Request): string {
+    return req.headers['user-agent'] || 'unknown';
+  }
   // Register new user
   static async register(req: Request<{}, ApiResponse, RegisterRequest>, res: Response<ApiResponse>, next: NextFunction) {
     try {
@@ -22,7 +33,9 @@ export class AuthController {
   // Login user
   static async login(req: Request<{}, ApiResponse, LoginRequest>, res: Response<ApiResponse>, next: NextFunction) {
     try {
-      const result = await AuthService.login(req.body);
+      const ip = AuthController.getClientIp(req);
+      const userAgent = AuthController.getUserAgent(req);
+      const result = await AuthService.login(req.body, ip, userAgent);
       
       res.status(200).json({
         success: true,
@@ -65,12 +78,76 @@ export class AuthController {
     }
   }
 
-  // Logout (client-side token removal)
-  static async logout(req: Request, res: Response<ApiResponse>, next: NextFunction) {
+  // Logout
+  static async logout(req: Request<{}, ApiResponse, { refreshToken?: string }>, res: Response<ApiResponse>, next: NextFunction) {
     try {
+      const userId = req.user!.userId;
+      const { refreshToken } = req.body;
+      await AuthService.logout(userId, refreshToken);
+      
       res.status(200).json({
         success: true,
         message: 'Logout successful'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Request password reset
+  static async requestPasswordReset(req: Request<{}, ApiResponse, { email: string }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      await AuthService.requestPasswordReset(email);
+      
+      res.status(200).json({
+        success: true,
+        message: 'If the email exists, a password reset link has been sent'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Reset password
+  static async resetPassword(req: Request<{}, ApiResponse, { token: string; newPassword: string }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const { token, newPassword } = req.body;
+      await AuthService.resetPassword(token, newPassword);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Password reset successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Verify email
+  static async verifyEmail(req: Request<{}, ApiResponse, { token: string }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const { token } = req.body;
+      await AuthService.verifyEmail(token);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Email verified successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Resend verification email
+  static async resendVerificationEmail(req: Request<{}, ApiResponse, { email: string }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const { email } = req.body;
+      await AuthService.resendVerificationEmail(email);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Verification email sent'
       });
     } catch (error) {
       next(error);

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl"]
@@ -11,25 +8,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  name      String?
-  password  String
-  role      UserRole @default(USER)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  projects Project[]
+  id                     String               @id @default(cuid())
+  email                  String               @unique
+  username               String               @unique
+  name                   String?
+  password               String
+  role                   UserRole             @default(USER)
+  isActive               Boolean              @default(true)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  emailVerificationToken String?
+  emailVerified          Boolean              @default(false)
+  emailVerifiedAt        DateTime?
+  failedLoginAttempts    Int                  @default(0)
+  lastLoginAt            DateTime?
+  lockoutUntil           DateTime?
+  auditLogs              AuditLog[]
+  passwordResetTokens    PasswordResetToken[]
+  projects               Project[]
+  refreshTokens          RefreshToken[]
 
   @@map("users")
 }
 
-// Project model
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  oldValue  Json?
+  newValue  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
 model Project {
   id          String        @id @default(cuid())
   name        String
@@ -39,40 +81,32 @@ model Project {
   endDate     DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-
-  // Relations
-  ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id])
-  tasks   Task[]
+  ownerId     String
+  owner       User          @relation(fields: [ownerId], references: [id])
+  tasks       Task[]
 
   @@map("projects")
 }
 
-// Task model
 model Task {
   id          String     @id @default(cuid())
   title       String
   description String?
   status      TaskStatus @default(TODO)
   priority    Priority   @default(MEDIUM)
-  duration    Int? // Duration in hours
+  duration    Int?
   startDate   DateTime?
   endDate     DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-
-  // Relations
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  // Self-referential relations for task dependencies
-  dependencies Task[] @relation("TaskDependencies")
-  dependents   Task[] @relation("TaskDependencies")
+  projectId   String
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks_A     Task[]     @relation("TaskDependencies")
+  tasks_B     Task[]     @relation("TaskDependencies")
 
   @@map("tasks")
 }
 
-// Enums
 enum UserRole {
   ADMIN
   MANAGER

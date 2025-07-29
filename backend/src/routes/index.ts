@@ -1,15 +1,19 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes';
+import userRoutes from './userRoutes';
 import projectRoutes from './projectRoutes';
 import taskRoutes from './taskRoutes';
+import auditLogRoutes from './auditLogRoutes';
 import { config } from '../config/env';
 
 const router = Router();
 
 // API routes
 router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
 router.use('/projects', projectRoutes);
 router.use('/tasks', taskRoutes);
+router.use('/audit-logs', auditLogRoutes);
 
 // API info endpoint
 router.get('/', (req, res) => {
@@ -19,8 +23,10 @@ router.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       auth: `${config.api.prefix}/auth`,
+      users: `${config.api.prefix}/users`,
       projects: `${config.api.prefix}/projects`,
       tasks: `${config.api.prefix}/tasks`,
+      auditLogs: `${config.api.prefix}/audit-logs`,
     }
   });
 });
