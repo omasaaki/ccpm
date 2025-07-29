@@ -11,6 +11,7 @@ import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Projects from './pages/Projects/Projects';
 import Tasks from './pages/Tasks/Tasks';
+import UserManagement from './pages/UserManagement/UserManagement';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -107,6 +108,16 @@ const AppContent: React.FC = () => {
               <ProtectedRoute>
                 <MainLayout>
                   <Tasks />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <UserManagement />
                 </MainLayout>
               </ProtectedRoute>
             }

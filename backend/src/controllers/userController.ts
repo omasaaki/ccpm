@@ -142,4 +142,64 @@ export class UserController {
       next(error);
     }
   }
+
+  // Bulk update users (Admin only)
+  static async bulkUpdate(req: Request<{}, ApiResponse, { userIds: string[]; updates: any }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const result = await UserService.bulkUpdate(req.body.userIds, req.body.updates);
+      
+      res.status(200).json({
+        success: true,
+        data: result,
+        message: `Successfully updated ${result.successCount} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Bulk activate users (Admin only)
+  static async bulkActivate(req: Request<{}, ApiResponse, { userIds: string[] }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const result = await UserService.bulkActivate(req.body.userIds);
+      
+      res.status(200).json({
+        success: true,
+        data: result,
+        message: `Successfully activated ${result.successCount} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Bulk deactivate users (Admin only)
+  static async bulkDeactivate(req: Request<{}, ApiResponse, { userIds: string[] }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const result = await UserService.bulkDeactivate(req.body.userIds);
+      
+      res.status(200).json({
+        success: true,
+        data: result,
+        message: `Successfully deactivated ${result.successCount} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Bulk delete users (Admin only)
+  static async bulkDelete(req: Request<{}, ApiResponse, { userIds: string[] }>, res: Response<ApiResponse>, next: NextFunction) {
+    try {
+      const result = await UserService.bulkDelete(req.body.userIds);
+      
+      res.status(200).json({
+        success: true,
+        data: result,
+        message: `Successfully deleted ${result.successCount} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

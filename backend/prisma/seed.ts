@@ -18,11 +18,117 @@ async function main() {
       name: 'Administrator',
       password: hashedPassword,
       role: 'ADMIN',
-      emailVerified: true,
+      emailVerifiedAt: new Date(),
     },
   });
 
   console.log('✅ Created admin user:', adminUser.email);
+
+  // Create sample organizations and departments
+  const org1 = await prisma.organization.create({
+    data: {
+      name: 'Tech Corp',
+      description: 'Technology company specializing in software development',
+    },
+  });
+
+  const org2 = await prisma.organization.create({
+    data: {
+      name: 'Marketing Agency',
+      description: 'Creative marketing and advertising agency',
+    },
+  });
+
+  const dept1 = await prisma.department.create({
+    data: {
+      name: 'Engineering',
+      description: 'Software development department',
+      organizationId: org1.id,
+    },
+  });
+
+  const dept2 = await prisma.department.create({
+    data: {
+      name: 'QA',
+      description: 'Quality assurance and testing',
+      organizationId: org1.id,
+    },
+  });
+
+  const dept3 = await prisma.department.create({
+    data: {
+      name: 'Creative',
+      description: 'Creative design team',
+      organizationId: org2.id,
+    },
+  });
+
+  console.log('✅ Created sample organizations and departments');
+
+  // Create sample users
+  const users = await Promise.all([
+    prisma.user.create({
+      data: {
+        email: 'manager1@example.com',
+        username: 'manager1',
+        name: 'John Manager',
+        password: hashedPassword,
+        role: 'MANAGER',
+        emailVerifiedAt: new Date(),
+        organizationId: org1.id,
+        departmentId: dept1.id,
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'user1@example.com',
+        username: 'user1',
+        name: 'Alice Developer',
+        password: hashedPassword,
+        role: 'USER',
+        emailVerifiedAt: new Date(),
+        organizationId: org1.id,
+        departmentId: dept1.id,
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'user2@example.com',
+        username: 'user2',
+        name: 'Bob Tester',
+        password: hashedPassword,
+        role: 'USER',
+        emailVerifiedAt: new Date(),
+        organizationId: org1.id,
+        departmentId: dept2.id,
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'user3@example.com',
+        username: 'user3',
+        name: 'Carol Designer',
+        password: hashedPassword,
+        role: 'USER',
+        emailVerifiedAt: new Date(),
+        organizationId: org2.id,
+        departmentId: dept3.id,
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'inactive@example.com',
+        username: 'inactive',
+        name: 'Inactive User',
+        password: hashedPassword,
+        role: 'USER',
+        isActive: false,
+        organizationId: org1.id,
+      },
+    }),
+  ]);
+
+  console.log('✅ Created sample users');
 
   // Create sample project
   const sampleProject = await prisma.project.upsert({
@@ -73,26 +179,7 @@ async function main() {
     },
   });
 
-  // Create task dependencies
-  await prisma.task.update({
-    where: { id: task2.id },
-    data: {
-      dependencies: {
-        connect: { id: task1.id },
-      },
-    },
-  });
-
-  await prisma.task.update({
-    where: { id: task3.id },
-    data: {
-      dependencies: {
-        connect: { id: task2.id },
-      },
-    },
-  });
-
-  console.log('✅ Created sample tasks with dependencies');
+  console.log('✅ Created sample tasks');
   console.log('🎉 Database seeding completed successfully!');
 }
 

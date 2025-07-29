@@ -355,4 +355,126 @@ export class UserService {
       userAgent: null,
     });
   }
+
+  // Bulk update users
+  static async bulkUpdate(userIds: string[], updates: Partial<{ role: UserRole }>): Promise<{ successCount: number; failureCount: number; errors: any[] }> {
+    const results = { successCount: 0, failureCount: 0, errors: [] as any[] };
+
+    for (const userId of userIds) {
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: updates
+        });
+        results.successCount++;
+      } catch (error: any) {
+        results.failureCount++;
+        results.errors.push({ userId, error: error.message });
+      }
+    }
+
+    await AuditLogService.log({
+      userId: null, // Admin action
+      action: 'admin.users.bulk_updated',
+      details: { userIds, updates, results },
+      ip: null,
+      userAgent: null,
+    });
+
+    return results;
+  }
+
+  // Bulk activate users
+  static async bulkActivate(userIds: string[]): Promise<{ successCount: number; failureCount: number; errors: any[] }> {
+    const results = { successCount: 0, failureCount: 0, errors: [] as any[] };
+
+    for (const userId of userIds) {
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { 
+            isActive: true,
+            failedLoginAttempts: 0,
+            lockoutUntil: null
+          }
+        });
+        results.successCount++;
+      } catch (error: any) {
+        results.failureCount++;
+        results.errors.push({ userId, error: error.message });
+      }
+    }
+
+    await AuditLogService.log({
+      userId: null, // Admin action
+      action: 'admin.users.bulk_activated',
+      details: { userIds, results },
+      ip: null,
+      userAgent: null,
+    });
+
+    return results;
+  }
+
+  // Bulk deactivate users
+  static async bulkDeactivate(userIds: string[]): Promise<{ successCount: number; failureCount: number; errors: any[] }> {
+    const results = { successCount: 0, failureCount: 0, errors: [] as any[] };
+
+    for (const userId of userIds) {
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { isActive: false }
+        });
+
+        // Revoke all refresh tokens
+        await prisma.refreshToken.updateMany({
+          where: { userId, revokedAt: null },
+          data: { revokedAt: new Date() }
+        });
+
+        results.successCount++;
+      } catch (error: any) {
+        results.failureCount++;
+        results.errors.push({ userId, error: error.message });
+      }
+    }
+
+    await AuditLogService.log({
+      userId: null, // Admin action
+      action: 'admin.users.bulk_deactivated',
+      details: { userIds, results },
+      ip: null,
+      userAgent: null,
+    });
+
+    return results;
+  }
+
+  // Bulk delete users
+  static async bulkDelete(userIds: string[]): Promise<{ successCount: number; failureCount: number; errors: any[] }> {
+    const results = { successCount: 0, failureCount: 0, errors: [] as any[] };
+
+    for (const userId of userIds) {
+      try {
+        await prisma.user.delete({
+          where: { id: userId }
+        });
+        results.successCount++;
+      } catch (error: any) {
+        results.failureCount++;
+        results.errors.push({ userId, error: error.message });
+      }
+    }
+
+    await AuditLogService.log({
+      userId: null, // Admin action
+      action: 'admin.users.bulk_deleted',
+      details: { userIds, results },
+      ip: null,
+      userAgent: null,
+    });
+
+    return results;
+  }
 }

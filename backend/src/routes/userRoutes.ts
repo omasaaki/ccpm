@@ -16,6 +16,14 @@ router.put('/password', UserController.changePassword);
 
 // Admin-only routes
 router.get('/', requireAdmin, UserController.listUsers);
+
+// Bulk operations (Admin-only) - must come before :id routes
+router.put('/bulk/update', requireAdmin, UserController.bulkUpdate);
+router.put('/bulk/activate', requireAdmin, UserController.bulkActivate);
+router.put('/bulk/deactivate', requireAdmin, UserController.bulkDeactivate);
+router.delete('/bulk/delete', requireAdmin, UserController.bulkDelete);
+
+// Individual user operations
 router.get('/:id', requireManager, UserController.getUser);
 router.put('/:id', requireAdmin, UserController.updateUser);
 router.put('/:id/activate', requireAdmin, UserController.activateUser);

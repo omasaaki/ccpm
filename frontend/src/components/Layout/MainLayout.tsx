@@ -26,6 +26,8 @@ import {
   ExitToApp,
   Brightness4,
   Brightness7,
+  People,
+  Business,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
@@ -64,6 +66,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     { text: 'ダッシュボード', icon: <Dashboard />, path: '/dashboard' },
     { text: 'プロジェクト', icon: <Folder />, path: '/projects' },
     { text: 'タスク', icon: <Assignment />, path: '/tasks' },
+    { text: 'ユーザー管理', icon: <People />, path: '/users', adminOnly: true },
+    { text: '組織管理', icon: <Business />, path: '/organizations', adminOnly: true },
     { text: '設定', icon: <Settings />, path: '/settings' },
   ];
   
@@ -76,17 +80,24 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item) => (
-          <ListItem
-            button
-            key={item.text}
-            onClick={() => navigate(item.path)}
-            selected={location.pathname === item.path}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
-        ))}
+        {menuItems.map((item) => {
+          // Hide admin-only items for non-admin users
+          if (item.adminOnly && user?.role !== 'ADMIN') {
+            return null;
+          }
+          
+          return (
+            <ListItem
+              button
+              key={item.text}
+              onClick={() => navigate(item.path)}
+              selected={location.pathname === item.path}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          );
+        })}
       </List>
     </Box>
   );
@@ -119,6 +130,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {location.pathname === '/dashboard' && 'ダッシュボード'}
             {location.pathname === '/projects' && 'プロジェクト'}
             {location.pathname === '/tasks' && 'タスク'}
+            {location.pathname === '/users' && 'ユーザー管理'}
+            {location.pathname === '/organizations' && '組織管理'}
             {location.pathname === '/settings' && '設定'}
           </Typography>
           

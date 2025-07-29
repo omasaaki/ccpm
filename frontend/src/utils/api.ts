@@ -84,8 +84,8 @@ export const apiClient = {
   patch: <T>(url: string, data?: any): Promise<ApiResponse<T>> =>
     api.patch(url, data).then(res => res.data),
   
-  delete: <T>(url: string): Promise<ApiResponse<T>> =>
-    api.delete(url).then(res => res.data),
+  delete: <T>(url: string, config?: any): Promise<ApiResponse<T>> =>
+    api.delete(url, config).then(res => res.data),
 };
 
 export default api;
