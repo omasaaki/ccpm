@@ -7,7 +7,7 @@ export class AuthController {
   // Get client IP address
   private static getClientIp(req: Request): string {
     const forwarded = req.headers['x-forwarded-for'] as string;
-    const ip = forwarded ? forwarded.split(',')[0].trim() : req.socket?.remoteAddress;
+    const ip = forwarded ? forwarded.split(',')[0]!.trim() : (req.socket?.remoteAddress || 'unknown');
     return ip || 'unknown';
   }
 

@@ -11,16 +11,21 @@ export interface PaginationParams {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  search?: string;
+  status?: 'PLANNING' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED';
+  isArchived?: boolean;
 }
 
 export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 export interface Project {
@@ -30,6 +35,7 @@ export interface Project {
   status: 'PLANNING' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED';
   startDate: string | null;
   endDate: string | null;
+  isArchived?: boolean;
   createdAt: string;
   updatedAt: string;
   owner: {
@@ -37,10 +43,29 @@ export interface Project {
     username: string;
     name: string | null;
   };
+  organization?: {
+    id: string;
+    name: string;
+  };
   _count?: {
     tasks: number;
+    members: number;
   };
   tasks?: Task[];
+  members?: ProjectMember[];
+}
+
+export interface ProjectMember {
+  id: string;
+  role: 'PM' | 'MEMBER' | 'VIEWER';
+  resourceRate: number;
+  joinedAt: string;
+  user: {
+    id: string;
+    name?: string;
+    email: string;
+    username: string;
+  };
 }
 
 export interface Task {

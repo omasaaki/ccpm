@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { TaskService } from '../services/taskService';
 import { ApiResponse, CreateTaskRequest, PaginationParams } from '../types/api';
+import { AppError } from '../middleware/errorHandler';
 
 export class TaskController {
   // Create new task
@@ -109,13 +110,8 @@ export class TaskController {
       const userId = req.user!.userId;
       const { id } = req.params;
       const { dependencyId } = req.body;
-      const task = await TaskService.addDependency(id, dependencyId, userId);
-      
-      res.status(200).json({
-        success: true,
-        data: task,
-        message: 'Dependency added successfully'
-      });
+      // const task = await TaskService.addDependency(id, dependencyId, userId);
+      throw new AppError('Dependency feature not implemented', 501);
     } catch (error) {
       next(error);
     }
@@ -126,13 +122,8 @@ export class TaskController {
     try {
       const userId = req.user!.userId;
       const { id, dependencyId } = req.params;
-      const task = await TaskService.removeDependency(id, dependencyId, userId);
-      
-      res.status(200).json({
-        success: true,
-        data: task,
-        message: 'Dependency removed successfully'
-      });
+      // const task = await TaskService.removeDependency(id, dependencyId, userId);
+      throw new AppError('Dependency feature not implemented', 501);
     } catch (error) {
       next(error);
     }

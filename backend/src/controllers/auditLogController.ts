@@ -22,7 +22,7 @@ export class AuditLogController {
         limit: Number(limit),
         userId: userId as string,
         action: action as string,
-        startDate: startDate ? new Date(startDate as string) : undefined,
+        startDate: startDate ? new Date(startDate as string) : undefined as any,
         endDate: endDate ? new Date(endDate as string) : undefined,
         sortBy: sortBy as 'createdAt',
         sortOrder: sortOrder as 'asc' | 'desc'
@@ -67,7 +67,7 @@ export class AuditLogController {
         limit: Number(limit),
         userId: req.params.userId,
         action: action as string,
-        startDate: startDate ? new Date(startDate as string) : undefined,
+        startDate: startDate ? new Date(startDate as string) : undefined as any,
         endDate: endDate ? new Date(endDate as string) : undefined
       });
 

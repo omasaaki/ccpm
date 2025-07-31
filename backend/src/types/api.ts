@@ -11,6 +11,9 @@ export interface PaginationParams {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  search?: string;
+  status?: string;
+  isArchived?: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -30,6 +33,7 @@ export interface CreateProjectRequest {
   description?: string;
   startDate?: string;
   endDate?: string;
+  organizationId?: string;
 }
 
 export interface UpdateProjectRequest {
@@ -38,6 +42,7 @@ export interface UpdateProjectRequest {
   status?: string;
   startDate?: string;
   endDate?: string;
+  isArchived?: boolean;
 }
 
 export interface CreateTaskRequest {

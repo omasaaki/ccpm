@@ -38,9 +38,9 @@ import {
   Group as GroupIcon,
 } from '@mui/icons-material';
 import { organizationService } from '../../services/organizationService';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { ErrorMessage } from '../../components/ui/ErrorMessage';
-import { NotificationSnackbar } from '../../components/ui/NotificationSnackbar';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import ErrorMessage from '../../components/ui/ErrorMessage';
+import NotificationSnackbar from '../../components/ui/NotificationSnackbar';
 
 interface Organization {
   id: string;

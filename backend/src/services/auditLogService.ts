@@ -38,13 +38,13 @@ export class AuditLogService {
     try {
       await prisma.auditLog.create({
         data: {
-          userId: params.userId,
+          userId: params.userId || null,
           action: params.action,
           entity: params.resourceType || 'System',
-          entityId: params.resourceId,
+          entityId: params.resourceId || null,
           newValue: params.details || {},
-          ipAddress: params.ip,
-          userAgent: params.userAgent,
+          ipAddress: params.ip || null,
+          userAgent: params.userAgent || null,
         },
       });
     } catch (error) {

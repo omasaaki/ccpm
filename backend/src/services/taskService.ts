@@ -6,7 +6,6 @@ import { CreateTaskRequest, PaginationParams, PaginatedResponse } from '../types
 export class TaskService {
   // Create new task
   static async create(projectId: string, userId: string, data: CreateTaskRequest): Promise<Task> {
-    // Verify project exists and user owns it
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
@@ -18,20 +17,6 @@ export class TaskService {
       throw new AppError('Project not found', 404);
     }
 
-    // Verify dependencies exist in the same project
-    if (data.dependencies && data.dependencies.length > 0) {
-      const dependencyTasks = await prisma.task.findMany({
-        where: {
-          id: { in: data.dependencies },
-          projectId: projectId,
-        }
-      });
-
-      if (dependencyTasks.length !== data.dependencies.length) {
-        throw new AppError('Some dependency tasks not found in this project', 400);
-      }
-    }
-
     const task = await prisma.task.create({
       data: {
         title: data.title,
@@ -41,31 +26,12 @@ export class TaskService {
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
         projectId: projectId,
-        ...(data.dependencies && data.dependencies.length > 0 && {
-          dependencies: {
-            connect: data.dependencies.map(id => ({ id }))
-          }
-        })
       },
       include: {
         project: {
           select: {
             id: true,
             name: true,
-          }
-        },
-        dependencies: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        },
-        dependents: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
           }
         }
       }
@@ -76,7 +42,6 @@ export class TaskService {
 
   // Get tasks by project
   static async getByProject(projectId: string, userId: string, params: PaginationParams): Promise<PaginatedResponse<Task>> {
-    // Verify project access
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
@@ -102,20 +67,6 @@ export class TaskService {
             select: {
               id: true,
               name: true,
-            }
-          },
-          dependencies: {
-            select: {
-              id: true,
-              title: true,
-              status: true,
-            }
-          },
-          dependents: {
-            select: {
-              id: true,
-              title: true,
-              status: true,
             }
           }
         }
@@ -156,20 +107,6 @@ export class TaskService {
             name: true,
             ownerId: true,
           }
-        },
-        dependencies: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        },
-        dependents: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
         }
       }
     });
@@ -183,7 +120,6 @@ export class TaskService {
 
   // Update task
   static async update(taskId: string, userId: string, data: Partial<CreateTaskRequest>): Promise<Task> {
-    // Verify task exists and user has access
     const existingTask = await prisma.task.findFirst({
       where: {
         id: taskId,
@@ -216,20 +152,6 @@ export class TaskService {
             id: true,
             name: true,
           }
-        },
-        dependencies: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        },
-        dependents: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
         }
       }
     });
@@ -239,7 +161,6 @@ export class TaskService {
 
   // Update task status
   static async updateStatus(taskId: string, userId: string, status: string): Promise<Task> {
-    // Verify task exists and user has access
     const existingTask = await prisma.task.findFirst({
       where: {
         id: taskId,
@@ -262,20 +183,6 @@ export class TaskService {
             id: true,
             name: true,
           }
-        },
-        dependencies: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        },
-        dependents: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
         }
       }
     });
@@ -285,7 +192,6 @@ export class TaskService {
 
   // Delete task
   static async delete(taskId: string, userId: string): Promise<void> {
-    // Verify task exists and user has access
     const existingTask = await prisma.task.findFirst({
       where: {
         id: taskId,
@@ -302,161 +208,5 @@ export class TaskService {
     await prisma.task.delete({
       where: { id: taskId }
     });
-  }
-
-  // Add task dependency
-  static async addDependency(taskId: string, dependencyId: string, userId: string): Promise<Task> {
-    // Verify both tasks exist and user has access
-    const [task, dependencyTask] = await Promise.all([
-      prisma.task.findFirst({
-        where: {
-          id: taskId,
-          project: { ownerId: userId }
-        },
-        include: { project: true }
-      }),
-      prisma.task.findFirst({
-        where: {
-          id: dependencyId,
-          project: { ownerId: userId }
-        }
-      })
-    ]);
-
-    if (!task || !dependencyTask) {
-      throw new AppError('Task not found', 404);
-    }
-
-    // Verify both tasks are in the same project
-    if (task.projectId !== dependencyTask.projectId) {
-      throw new AppError('Tasks must be in the same project', 400);
-    }
-
-    // Check for circular dependency
-    const wouldCreateCircle = await this.checkCircularDependency(dependencyId, taskId);
-    if (wouldCreateCircle) {
-      throw new AppError('This would create a circular dependency', 400);
-    }
-
-    const updatedTask = await prisma.task.update({
-      where: { id: taskId },
-      data: {
-        dependencies: {
-          connect: { id: dependencyId }
-        }
-      },
-      include: {
-        project: {
-          select: {
-            id: true,
-            name: true,
-          }
-        },
-        dependencies: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        },
-        dependents: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        }
-      }
-    });
-
-    return updatedTask;
-  }
-
-  // Remove task dependency
-  static async removeDependency(taskId: string, dependencyId: string, userId: string): Promise<Task> {
-    // Verify task exists and user has access
-    const task = await prisma.task.findFirst({
-      where: {
-        id: taskId,
-        project: { ownerId: userId }
-      }
-    });
-
-    if (!task) {
-      throw new AppError('Task not found', 404);
-    }
-
-    const updatedTask = await prisma.task.update({
-      where: { id: taskId },
-      data: {
-        dependencies: {
-          disconnect: { id: dependencyId }
-        }
-      },
-      include: {
-        project: {
-          select: {
-            id: true,
-            name: true,
-          }
-        },
-        dependencies: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        },
-        dependents: {
-          select: {
-            id: true,
-            title: true,
-            status: true,
-          }
-        }
-      }
-    });
-
-    return updatedTask;
-  }
-
-  // Check for circular dependency
-  private static async checkCircularDependency(startTaskId: string, targetTaskId: string): Promise<boolean> {
-    const visited = new Set<string>();
-    
-    const checkPath = async (currentTaskId: string): Promise<boolean> => {
-      if (currentTaskId === targetTaskId) {
-        return true;
-      }
-      
-      if (visited.has(currentTaskId)) {
-        return false;
-      }
-      
-      visited.add(currentTaskId);
-      
-      const dependencies = await prisma.task.findUnique({
-        where: { id: currentTaskId },
-        select: {
-          dependencies: {
-            select: { id: true }
-          }
-        }
-      });
-      
-      if (!dependencies) {
-        return false;
-      }
-      
-      for (const dep of dependencies.dependencies) {
-        if (await checkPath(dep.id)) {
-          return true;
-        }
-      }
-      
-      return false;
-    };
-    
-    return checkPath(startTaskId);
   }
 }

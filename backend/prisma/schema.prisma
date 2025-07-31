@@ -27,7 +27,13 @@ model User {
   auditLogs              AuditLog[]
   passwordResetTokens    PasswordResetToken[]
   projects               Project[]
+  projectMemberships     ProjectMember[]
   refreshTokens          RefreshToken[]
+  organizationId         String?
+  organization           Organization?        @relation(fields: [organizationId], references: [id])
+  departmentId           String?
+  department             Department?          @relation(fields: [departmentId], references: [id])
+  managedDepartments     Department[]         @relation("DepartmentManager")
 
   @@map("users")
 }
@@ -72,18 +78,57 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-model Project {
-  id          String        @id @default(cuid())
-  name        String
+model Organization {
+  id          String       @id @default(cuid())
+  name        String       @unique
   description String?
-  status      ProjectStatus @default(PLANNING)
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  ownerId     String
-  owner       User          @relation(fields: [ownerId], references: [id])
-  tasks       Task[]
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  users       User[]
+  departments Department[]
+  projects    Project[]
+
+  @@map("organizations")
+}
+
+model Department {
+  id             String        @id @default(cuid())
+  name           String
+  description    String?
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parentId       String?
+  parent         Department?   @relation("DepartmentHierarchy", fields: [parentId], references: [id])
+  children       Department[]  @relation("DepartmentHierarchy")
+  managerId      String?
+  manager        User?         @relation("DepartmentManager", fields: [managerId], references: [id])
+  users          User[]
+
+  @@unique([organizationId, name])
+  @@map("departments")
+}
+
+model Project {
+  id             String        @id @default(cuid())
+  name           String
+  description    String?
+  status         ProjectStatus @default(PLANNING)
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  isArchived     Boolean       @default(false)
+  settings       Json?
+  ownerId        String
+  owner          User          @relation(fields: [ownerId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  tasks          Task[]
+  members        ProjectMember[]
 
   @@map("projects")
 }
@@ -105,6 +150,20 @@ model Task {
   tasks_B     Task[]     @relation("TaskDependencies")
 
   @@map("tasks")
+}
+
+model ProjectMember {
+  id           String      @id @default(cuid())
+  role         ProjectRole @default(MEMBER)
+  resourceRate Float       @default(100)
+  joinedAt     DateTime    @default(now())
+  projectId    String
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+  @@map("project_members")
 }
 
 enum UserRole {
@@ -134,4 +193,10 @@ enum Priority {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+enum ProjectRole {
+  PM
+  MEMBER
+  VIEWER
 }

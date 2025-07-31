@@ -26,9 +26,9 @@ export class OrganizationController {
     try {
       const { page, limit, search, isActive } = req.query;
       const result = await OrganizationService.listOrganizations({
-        page: page ? Number(page) : undefined,
-        limit: limit ? Number(limit) : undefined,
-        search: search as string,
+        page: page ? Number(page) : 1,
+        limit: limit ? Number(limit) : 10,
+        search: search as string || '',
         isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined
       });
       
@@ -114,9 +114,9 @@ export class OrganizationController {
     try {
       const { page, limit, search, organizationId, isActive } = req.query;
       const result = await OrganizationService.listDepartments({
-        page: page ? Number(page) : undefined,
-        limit: limit ? Number(limit) : undefined,
-        search: search as string,
+        page: page ? Number(page) : 1,
+        limit: limit ? Number(limit) : 10,
+        search: search as string || '',
         organizationId: organizationId as string,
         isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined
       });

@@ -290,7 +290,7 @@ export class OrganizationService {
   }
 
   static async listDepartments(params: ListDepartmentsParams = {}): Promise<{
-    departments: DepartmentWithHierarchy[];
+    departments: any[];
     pagination: {
       page: number;
       limit: number;
@@ -381,7 +381,7 @@ export class OrganizationService {
       throw new AppError('Department not found', 404);
     }
 
-    return department;
+    return department as any;
   }
 
   static async updateDepartment(id: string, data: {
@@ -527,13 +527,13 @@ export class OrganizationService {
         break;
       }
 
-      currentParentId = parent.parentId;
+      currentParentId = parent.parentId || '';
     }
 
     return false;
   }
 
-  static async getDepartmentHierarchy(organizationId: string): Promise<DepartmentWithHierarchy[]> {
+  static async getDepartmentHierarchy(organizationId: string): Promise<any[]> {
     const departments = await prisma.department.findMany({
       where: { 
         organizationId,

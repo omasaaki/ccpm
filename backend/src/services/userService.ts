@@ -13,7 +13,7 @@ interface ListUsersParams {
 }
 
 interface ListUsersResult {
-  users: Omit<User, 'password'>[];
+  users: any[];
   pagination: {
     page: number;
     limit: number;
@@ -24,7 +24,7 @@ interface ListUsersResult {
 
 export class UserService {
   // Get user profile
-  static async getProfile(userId: string): Promise<Omit<User, 'password'>> {
+  static async getProfile(userId: string): Promise<any> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -50,7 +50,7 @@ export class UserService {
   }
 
   // Update user profile
-  static async updateProfile(userId: string, data: { name?: string; username?: string }): Promise<Omit<User, 'password'>> {
+  static async updateProfile(userId: string, data: { name?: string; username?: string }): Promise<any> {
     // Check if username is already taken
     if (data.username) {
       const existingUser = await prisma.user.findFirst({
@@ -189,7 +189,7 @@ export class UserService {
   }
 
   // Get specific user
-  static async getUser(userId: string): Promise<Omit<User, 'password'>> {
+  static async getUser(userId: string): Promise<any> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -217,7 +217,7 @@ export class UserService {
   }
 
   // Update user (Admin function)
-  static async updateUser(userId: string, data: Partial<{ name: string; username: string; email: string; role: UserRole }>): Promise<Omit<User, 'password'>> {
+  static async updateUser(userId: string, data: Partial<{ name: string; username: string; email: string; role: UserRole }>): Promise<any> {
     // Check if email/username is already taken
     if (data.email || data.username) {
       const existingUser = await prisma.user.findFirst({
@@ -270,7 +270,7 @@ export class UserService {
   }
 
   // Activate user
-  static async activateUser(userId: string): Promise<Omit<User, 'password'>> {
+  static async activateUser(userId: string): Promise<any> {
     const user = await prisma.user.update({
       where: { id: userId },
       data: { 
@@ -305,7 +305,7 @@ export class UserService {
   }
 
   // Deactivate user
-  static async deactivateUser(userId: string): Promise<Omit<User, 'password'>> {
+  static async deactivateUser(userId: string): Promise<any> {
     const user = await prisma.user.update({
       where: { id: userId },
       data: { isActive: false },

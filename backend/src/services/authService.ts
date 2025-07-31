@@ -219,7 +219,7 @@ export class AuthService {
     });
 
     // Remove sensitive fields from response
-    const { password, emailVerificationToken, ...userWithoutPassword } = user;
+    const { password, ...userWithoutPassword } = user as any;
 
     return {
       user: userWithoutPassword,
@@ -247,7 +247,7 @@ export class AuthService {
       throw new AppError('User not found', 404);
     }
 
-    return user;
+    return user as any;
   }
 
   // Refresh tokens
